@@ -200,7 +200,7 @@ export default function TodosPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-ink">我的待办</h1>
           <p className="mt-1 text-sm text-muted">

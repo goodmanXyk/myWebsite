@@ -436,12 +436,12 @@ export default function HealthPage() {
         <span className="text-sm text-muted">{fullDateLabel(selectedDate)}</span>
       </div>
 
-      <div className="mb-6 flex flex-wrap gap-2">
+      <div className="mb-6 flex gap-2 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible md:pb-0">
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`rounded-lg border px-4 py-2 text-sm transition-colors ${
+            className={`shrink-0 whitespace-nowrap rounded-lg border px-4 py-2 text-sm transition-colors ${
               tab === t.key
                 ? "border-ink bg-ink text-white"
                 : "border-line bg-white text-muted hover:text-ink"

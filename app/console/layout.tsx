@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { Sidebar } from "@/components/console/Sidebar";
@@ -15,6 +15,7 @@ export default function ConsoleLayout({
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [navOpen, setNavOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -33,10 +34,29 @@ export default function ConsoleLayout({
   return (
     <ToastProvider>
       <div className="flex h-screen overflow-hidden bg-white">
-        <Sidebar user={user} />
+        {/* 桌面端：固定侧栏 */}
+        <div className="hidden h-full md:block">
+          <Sidebar user={user} />
+        </div>
+
+        {/* 移动端：抽屉 + 遮罩 */}
+        {navOpen && (
+          <div className="fixed inset-0 z-50 md:hidden">
+            <div
+              className="absolute inset-0 bg-black/40"
+              onClick={() => setNavOpen(false)}
+            />
+            <div className="animate-slide-in-left absolute left-0 top-0 h-full w-60 bg-white shadow-xl">
+              <Sidebar user={user} onNavigate={() => setNavOpen(false)} />
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-1 flex-col overflow-hidden">
-          <Topbar user={user} />
-          <main className="flex-1 overflow-y-auto bg-canvas p-8">{children}</main>
+          <Topbar user={user} onMenuClick={() => setNavOpen(true)} />
+          <main className="flex-1 overflow-y-auto bg-canvas p-4 md:p-8">
+            {children}
+          </main>
         </div>
       </div>
       <ReminderWatcher />

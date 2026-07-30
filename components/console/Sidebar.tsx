@@ -21,7 +21,13 @@ function initials(user: User): string {
   return source?.[0]?.toUpperCase() || "U";
 }
 
-export function Sidebar({ user }: { user: User }) {
+export function Sidebar({
+  user,
+  onNavigate,
+}: {
+  user: User;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
   return (
     <aside className="flex h-full w-60 flex-col border-r border-line bg-white">
@@ -39,6 +45,7 @@ export function Sidebar({ user }: { user: User }) {
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  onClick={onNavigate}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                     active
                       ? "bg-gray-100 font-medium text-ink"

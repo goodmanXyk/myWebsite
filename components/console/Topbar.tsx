@@ -18,15 +18,33 @@ function initials(user: User): string {
   return source?.[0]?.toUpperCase() || "U";
 }
 
-export function Topbar({ user }: { user: User }) {
+export function Topbar({
+  user,
+  onMenuClick,
+}: {
+  user: User;
+  onMenuClick?: () => void;
+}) {
   const { logout } = useAuth();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const title = titleMap[pathname] ?? "Dashboard";
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-line bg-white px-6">
-      <h2 className="text-sm font-medium text-ink">{title}</h2>
+    <header className="flex h-14 items-center justify-between border-b border-line bg-white px-4 md:px-6">
+      <div className="flex items-center gap-2">
+        {onMenuClick && (
+          <button
+            type="button"
+            onClick={onMenuClick}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-ink transition-colors hover:bg-gray-100 md:hidden"
+            aria-label="打开菜单"
+          >
+            <span className="text-lg leading-none">☰</span>
+          </button>
+        )}
+        <h2 className="text-sm font-medium text-ink">{title}</h2>
+      </div>
       <div className="relative flex items-center gap-3">
         <input
           className="hidden w-64 rounded-lg border border-line bg-canvas px-3 py-1.5 text-sm outline-none transition-colors placeholder:text-muted focus:border-ink md:block"
