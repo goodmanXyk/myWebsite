@@ -1,10 +1,8 @@
 /** @type {import('next').NextConfig} */
+// 部署到 Vercel：使用 Vercel 原生 Next.js 构建（自动 HTTPS / 自动重建），
+// 不再做静态导出（output:"export" 会与 Vercel 框架流程冲突，导致其找不到 routes-manifest.json）。
 const nextConfig = {
-  // 路线A：纯静态导出，可托管到任意免费静态平台（Vercel/Netlify/CloudStudio/GitHub Pages）
-  output: "export",
-  // 静态导出不支持服务端图片优化，统一关闭
-  images: { unoptimized: true },
-  // 若后续切回服务端渲染，注释掉 output 与 images 即可
+  reactStrictMode: true,
 };
 
 export default nextConfig;
