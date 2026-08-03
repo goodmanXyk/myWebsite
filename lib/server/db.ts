@@ -7,20 +7,25 @@ declare global {
   var __flowaiPool: mysql.Pool | undefined;
 }
 
-const pool =
-  globalThis.__flowaiPool ??
-  mysql.createPool({
-    host: process.env.MYSQL_HOST || "127.0.0.1",
-    port: Number(process.env.MYSQL_PORT || 3306),
-    user: process.env.MYSQL_USER || "root",
-    password: process.env.MYSQL_PASSWORD || "",
-    database: process.env.MYSQL_DATABASE || "flowai",
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-    charset: "utf8mb4",
-    timezone: "+08:00",
-  });
+const poolOptions: mysql.PoolOptions = {
+  host: process.env.MYSQL_HOST || "127.0.0.1",
+  port: Number(process.env.MYSQL_PORT || 3306),
+  user: process.env.MYSQL_USER || "root",
+  password: process.env.MYSQL_PASSWORD || "",
+  database: process.env.MYSQL_DATABASE || "flowai",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  charset: "utf8mb4",
+  timezone: "+08:00",
+};
+
+// 云端数据库（如 TiDB Cloud）公共端点强制 TLS：MYSQL_SSL=true 时启用加密连接
+if (process.env.MYSQL_SSL === "true") {
+  poolOptions.ssl = { rejectUnauthorized: false };
+}
+
+const pool = globalThis.__flowaiPool ?? mysql.createPool(poolOptions);
 
 if (process.env.NODE_ENV !== "production") {
   globalThis.__flowaiPool = pool;
