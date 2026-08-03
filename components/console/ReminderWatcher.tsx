@@ -19,9 +19,14 @@ export function ReminderWatcher() {
   useEffect(() => {
     if (!user) return;
 
-    const check = () => {
+    const check = async () => {
       const now = Date.now();
-      const todos = store.todos.get(user.id);
+      let todos;
+      try {
+        todos = await store.todos.get(user.id);
+      } catch {
+        return;
+      }
       for (const t of todos) {
         if (t.status === "completed") {
           reminded.current.delete(t.id);

@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { getStore } from "@/lib/store";
 import type {
+  HealthSettings,
   MealType,
   SleepEntry,
   SleepQuality,
@@ -100,21 +101,37 @@ export default function HealthPage() {
   const [dietList, setDietList] = useState<DietEntry[]>([]);
   const [workoutList, setWorkoutList] = useState<WorkoutEntry[]>([]);
   const [sleepList, setSleepList] = useState<SleepEntry[]>([]);
+  const [waterSettings, setWaterSettings] = useState<HealthSettings>({ waterTargetMl: 2000 });
 
-  const loadAll = () => {
+  const loadAll = async () => {
     if (!user) return;
     const uid = user.id;
-    setWaterDays(store.health.getWaterDays(uid));
-    setWeightList(store.health.getWeightEntries(uid));
-    setDietList(store.health.getDietEntries(uid));
-    setWorkoutList(store.health.getWorkoutEntries(uid));
-    setSleepList(store.health.getSleepEntries(uid));
+    try {
+      const [w, wt, d, wo, s, hs] = await Promise.all([
+        store.health.getWaterDays(uid),
+        store.health.getWeightEntries(uid),
+        store.health.getDietEntries(uid),
+        store.health.getWorkoutEntries(uid),
+        store.health.getSleepEntries(uid),
+        store.health.getSettings(uid),
+      ]);
+      setWaterDays(w);
+      setWeightList(wt);
+      setDietList(d);
+      setWorkoutList(wo);
+      setSleepList(s);
+      setWaterSettings(hs);
+    } catch (e) {
+      console.error("加载健康数据失败", e);
+    }
   };
 
   useEffect(() => {
     if (!user) return;
-    loadAll();
-    setLoaded(true);
+    (async () => {
+      await loadAll();
+      setLoaded(true);
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
@@ -131,7 +148,6 @@ export default function HealthPage() {
   const daySleep = sleepList.filter((e) => e.date === selectedDate);
 
   // ===== Water =====
-  const waterSettings = store.health.getSettings(uid);
   const todayMl = dayWater?.amountMl ?? 0;
   const waterPercent = waterSettings.waterTargetMl
     ? (todayMl / waterSettings.waterTargetMl) * 100
@@ -142,10 +158,14 @@ export default function HealthPage() {
   });
   const [customMl, setCustomMl] = useState(250);
 
-  const handleAddWater = (ml: number) => {
-    store.health.addWater(uid, ml, selectedDate);
-    show(`${isToday ? "今日" : shortDateLabel(selectedDate)} 已记录饮水 ${ml}ml 💧`, "success");
-    loadAll();
+  const handleAddWater = async (ml: number) => {
+    try {
+      await store.health.addWater(uid, ml, selectedDate);
+      show(`${isToday ? "今日" : shortDateLabel(selectedDate)} 已记录饮水 ${ml}ml 💧`, "success");
+      await loadAll();
+    } catch (e) {
+      show(e instanceof Error ? e.message : "记录失败", "warning");
+    }
   };
 
   // ===== Weight =====
@@ -157,17 +177,21 @@ export default function HealthPage() {
   const [weightKg, setWeightKg] = useState("");
   const [weightNote, setWeightNote] = useState("");
 
-  const handleAddWeight = () => {
+  const handleAddWeight = async () => {
     const kg = parseFloat(weightKg);
     if (isNaN(kg) || kg <= 0) {
       show("请输入有效体重", "warning");
       return;
     }
-    store.health.addWeightEntry(uid, kg, selectedDate, weightNote.trim() || undefined);
-    setWeightKg("");
-    setWeightNote("");
-    show(`已记录体重 ${kg}kg ⚖️`, "success");
-    loadAll();
+    try {
+      await store.health.addWeightEntry(uid, kg, selectedDate, weightNote.trim() || undefined);
+      setWeightKg("");
+      setWeightNote("");
+      show(`已记录体重 ${kg}kg ⚖️`, "success");
+      await loadAll();
+    } catch (e) {
+      show(e instanceof Error ? e.message : "记录失败", "warning");
+    }
   };
 
   // ===== Diet =====
@@ -187,17 +211,21 @@ export default function HealthPage() {
   const [dietFood, setDietFood] = useState("");
   const [dietCal, setDietCal] = useState("");
 
-  const handleAddDiet = () => {
+  const handleAddDiet = async () => {
     if (!dietFood.trim()) {
       show("请输入食物名称", "warning");
       return;
     }
     const cal = dietCal.trim() ? parseFloat(dietCal) : undefined;
-    store.health.addDietEntry(uid, dietMeal, dietFood.trim(), isNaN(cal as number) ? undefined : cal, selectedDate);
-    setDietFood("");
-    setDietCal("");
-    show("已记录饮食 🍱", "success");
-    loadAll();
+    try {
+      await store.health.addDietEntry(uid, dietMeal, dietFood.trim(), isNaN(cal as number) ? undefined : cal, selectedDate);
+      setDietFood("");
+      setDietCal("");
+      show("已记录饮食 🍱", "success");
+      await loadAll();
+    } catch (e) {
+      show(e instanceof Error ? e.message : "记录失败", "warning");
+    }
   };
 
   // ===== Workout =====
@@ -215,7 +243,7 @@ export default function HealthPage() {
   const [workoutName, setWorkoutName] = useState("");
   const [workoutMin, setWorkoutMin] = useState("");
 
-  const handleAddWorkout = () => {
+  const handleAddWorkout = async () => {
     if (!workoutName.trim()) {
       show("请输入运动项目", "warning");
       return;
@@ -225,11 +253,15 @@ export default function HealthPage() {
       show("请输入有效时长(分钟)", "warning");
       return;
     }
-    store.health.addWorkoutEntry(uid, workoutName.trim(), min, selectedDate);
-    setWorkoutName("");
-    setWorkoutMin("");
-    show("已添加健身计划 🏋️", "success");
-    loadAll();
+    try {
+      await store.health.addWorkoutEntry(uid, workoutName.trim(), min, selectedDate);
+      setWorkoutName("");
+      setWorkoutMin("");
+      show("已添加健身计划 🏋️", "success");
+      await loadAll();
+    } catch (e) {
+      show(e instanceof Error ? e.message : "添加失败", "warning");
+    }
   };
 
   // ===== Sleep =====
@@ -245,21 +277,25 @@ export default function HealthPage() {
   const [sleepQuality, setSleepQuality] = useState<SleepQuality>("good");
   const [sleepNote, setSleepNote] = useState("");
 
-  const handleAddSleep = () => {
+  const handleAddSleep = async () => {
     if (!bedtime || !wakeTime) {
       show("请填写入睡与起床时间", "warning");
       return;
     }
-    store.health.addSleepEntry(uid, {
-      date: selectedDate,
-      bedtime,
-      wakeTime,
-      quality: sleepQuality,
-      note: sleepNote.trim() || undefined,
-    });
-    setSleepNote("");
-    show("已记录睡眠 💤", "success");
-    loadAll();
+    try {
+      await store.health.addSleepEntry(uid, {
+        date: selectedDate,
+        bedtime,
+        wakeTime,
+        quality: sleepQuality,
+        note: sleepNote.trim() || undefined,
+      });
+      setSleepNote("");
+      show("已记录睡眠 💤", "success");
+      await loadAll();
+    } catch (e) {
+      show(e instanceof Error ? e.message : "记录失败", "warning");
+    }
   };
 
   // 未来 7 天规划（含今天）
@@ -498,14 +534,18 @@ export default function HealthPage() {
                     />
                     <Button
                       variant="secondary"
-                      onClick={() => {
+                      onClick={async () => {
                         const v = Number(
                           (document.getElementById("waterTarget") as HTMLInputElement).value
                         );
                         if (v > 0) {
-                          store.health.saveSettings(uid, { waterTargetMl: v });
-                          show("已更新饮水目标", "success");
-                          loadAll();
+                          try {
+                            await store.health.saveSettings(uid, { waterTargetMl: v });
+                            show("已更新饮水目标", "success");
+                            await loadAll();
+                          } catch (e) {
+                            show(e instanceof Error ? e.message : "保存失败", "warning");
+                          }
                         }
                       }}
                     >
@@ -576,9 +616,13 @@ export default function HealthPage() {
                           {e.note ? <span className="text-muted"> · {e.note}</span> : null}
                         </span>
                         <button
-                          onClick={() => {
-                            store.health.deleteWeightEntry(uid, e.id);
-                            loadAll();
+                          onClick={async () => {
+                            try {
+                              await store.health.deleteWeightEntry(uid, e.id);
+                              await loadAll();
+                            } catch (err) {
+                              show(err instanceof Error ? err.message : "删除失败", "warning");
+                            }
                           }}
                           className="text-xs text-red-500 hover:underline"
                         >
@@ -657,9 +701,13 @@ export default function HealthPage() {
                                   )}
                                 </span>
                                 <button
-                                  onClick={() => {
-                                    store.health.deleteDietEntry(uid, d.id);
-                                    loadAll();
+                                  onClick={async () => {
+                                    try {
+                                      await store.health.deleteDietEntry(uid, d.id);
+                                      await loadAll();
+                                    } catch (err) {
+                                      show(err instanceof Error ? err.message : "删除失败", "warning");
+                                    }
                                   }}
                                   className="text-xs text-red-500 hover:underline"
                                 >
@@ -753,9 +801,13 @@ export default function HealthPage() {
                         <input
                           type="checkbox"
                           checked={w.done}
-                          onChange={() => {
-                            store.health.updateWorkoutEntry(uid, w.id, { done: !w.done });
-                            loadAll();
+                          onChange={async () => {
+                            try {
+                              await store.health.updateWorkoutEntry(uid, w.id, { done: !w.done });
+                              await loadAll();
+                            } catch (err) {
+                              show(err instanceof Error ? err.message : "更新失败", "warning");
+                            }
                           }}
                           className="h-4 w-4 accent-brand"
                         />
@@ -764,9 +816,13 @@ export default function HealthPage() {
                         </span>
                         <span className="text-xs text-muted">{w.durationMin} min</span>
                         <button
-                          onClick={() => {
-                            store.health.deleteWorkoutEntry(uid, w.id);
-                            loadAll();
+                          onClick={async () => {
+                            try {
+                              await store.health.deleteWorkoutEntry(uid, w.id);
+                              await loadAll();
+                            } catch (err) {
+                              show(err instanceof Error ? err.message : "删除失败", "warning");
+                            }
                           }}
                           className="text-xs text-red-500 hover:underline"
                         >
@@ -871,9 +927,13 @@ export default function HealthPage() {
                           <span className="text-muted"> · 质量 {qualityLabel[s.quality]}</span>
                         </span>
                         <button
-                          onClick={() => {
-                            store.health.deleteSleepEntry(uid, s.id);
-                            loadAll();
+                          onClick={async () => {
+                            try {
+                              await store.health.deleteSleepEntry(uid, s.id);
+                              await loadAll();
+                            } catch (err) {
+                              show(err instanceof Error ? err.message : "删除失败", "warning");
+                            }
                           }}
                           className="text-xs text-red-500 hover:underline"
                         >

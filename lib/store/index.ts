@@ -1,9 +1,9 @@
-// 数据访问层入口：根据 API_MODE 返回实现。
-// 当前恒为 LocalStore（纯前端 localStorage mock）。
-// 未来接真实后端时，在此根据 API_MODE === "remote" 返回 RemoteStore 即可，页面零改动。
-
+﻿// 数据访问层入口：根据 API_MODE 返回实现。
+// - local（默认）：LocalStore，纯前端 localStorage mock
+// - remote：RemoteStore，通过 Next.js API Route + MySQL 读写真实后端
 import { API_MODE } from "@/lib/config";
 import { createLocalStore } from "./local";
+import { createRemoteStore } from "./remote";
 import type { Store } from "./types";
 
 let _store: Store | null = null;
@@ -12,8 +12,7 @@ export function getStore(): Store {
   if (_store) return _store;
   switch (API_MODE) {
     case "remote":
-      // TODO: _store = createRemoteStore(); // 接真实后端时启用
-      _store = createLocalStore();
+      _store = createRemoteStore();
       break;
     default:
       _store = createLocalStore();

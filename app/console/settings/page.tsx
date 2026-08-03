@@ -22,26 +22,37 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (!user) return;
-    const s = store.notify.getSettings(user.id);
-    setEnabled(s.enabled);
-    setLeadMinutes(s.leadMinutes);
-    setWecom(s.webhooks.wecom ?? "");
-    setDingtalk(s.webhooks.dingtalk ?? "");
-    setLoaded(true);
+    (async () => {
+      try {
+        const s = await store.notify.getSettings(user.id);
+        setEnabled(s.enabled);
+        setLeadMinutes(s.leadMinutes);
+        setWecom(s.webhooks.wecom ?? "");
+        setDingtalk(s.webhooks.dingtalk ?? "");
+      } catch (e) {
+        console.error("加载通知设置失败", e);
+      } finally {
+        setLoaded(true);
+      }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!user) return;
-    store.notify.saveSettings(user.id, {
-      enabled,
-      leadMinutes: Math.max(0, Number(leadMinutes) || 0),
-      webhooks: {
-        wecom: wecom.trim() || undefined,
-        dingtalk: dingtalk.trim() || undefined,
-      },
-    });
-    show("通知设置已保存 ✅", "success");
+    try {
+      await store.notify.saveSettings(user.id, {
+        enabled,
+        leadMinutes: Math.max(0, Number(leadMinutes) || 0),
+        webhooks: {
+          wecom: wecom.trim() || undefined,
+          dingtalk: dingtalk.trim() || undefined,
+        },
+      });
+      show("通知设置已保存 ✅", "success");
+    } catch (e) {
+      show(e instanceof Error ? e.message : "保存失败", "warning");
+    }
   };
 
   const handleTest = (kind: WebhookKind) => {

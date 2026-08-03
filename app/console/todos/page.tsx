@@ -99,10 +99,15 @@ export default function TodosPage() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [error, setError] = useState("");
 
-  const reload = () => {
+  const reload = async () => {
     if (!user) return;
-    setTodos(store.todos.get(user.id));
-    setLoaded(true);
+    try {
+      setTodos(await store.todos.get(user.id));
+    } catch (e) {
+      console.error("??????", e);
+    } finally {
+      setLoaded(true);
+    }
   };
 
   useEffect(() => {
@@ -157,7 +162,7 @@ export default function TodosPage() {
     setModalOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!user) return;
     if (!form.title.trim()) {
       setError("请填写标题 / Title is required");
@@ -165,7 +170,7 @@ export default function TodosPage() {
     }
     const due = fromLocalInput(form.due);
     if (editing) {
-      store.todos.update(user.id, editing.id, {
+      await store.todos.update(user.id, editing.id, {
         title: form.title.trim(),
         description: form.description.trim() || undefined,
         due,
@@ -174,7 +179,7 @@ export default function TodosPage() {
         completedAt: form.status === "completed" ? editing.completedAt ?? Date.now() : null,
       });
     } else {
-      store.todos.add(user.id, {
+      await store.todos.add(user.id, {
         title: form.title.trim(),
         description: form.description.trim() || undefined,
         due,
@@ -182,20 +187,28 @@ export default function TodosPage() {
       });
     }
     setModalOpen(false);
-    reload();
+    await reload();
   };
 
-  const handleToggle = (t: Todo) => {
+  const handleToggle = async (t: Todo) => {
     if (!user) return;
-    store.todos.toggle(user.id, t.id);
-    reload();
+    try {
+      await store.todos.toggle(user.id, t.id);
+      await reload();
+    } catch (e) {
+      console.error("??????", e);
+    }
   };
 
-  const handleDelete = (t: Todo) => {
+  const handleDelete = async (t: Todo) => {
     if (!user) return;
     if (!confirm(`确认删除「${t.title}」？`)) return;
-    store.todos.remove(user.id, t.id);
-    reload();
+    try {
+      await store.todos.remove(user.id, t.id);
+      await reload();
+    } catch (e) {
+      console.error("删除失败", e);
+    }
   };
 
   return (

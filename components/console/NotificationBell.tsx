@@ -20,12 +20,20 @@ export function NotificationBell() {
 
   const refresh = useCallback(() => {
     if (!user) return;
-    const now = Date.now();
-    const due = store.todos.get(user.id).filter(
-      (t) => t.status === "pending" && t.due != null && t.due <= now
-    );
-    setDueTodos(due);
-    setCount(due.length);
+    store.todos
+      .get(user.id)
+      .then((list) => {
+        const now = Date.now();
+        const due = list.filter(
+          (t) => t.status === "pending" && t.due != null && t.due <= now
+        );
+        setDueTodos(due);
+        setCount(due.length);
+      })
+      .catch(() => {
+        setDueTodos([]);
+        setCount(0);
+      });
   }, [user]);
 
   useEffect(() => {

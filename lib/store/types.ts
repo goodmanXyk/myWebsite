@@ -1,5 +1,6 @@
-// 统一数据访问层类型定义。
-// 未来接真实后端时，只需在 lib/store 提供 RemoteStore 实现同一组接口，页面无需改动。
+﻿// 统一数据访问层类型定义。
+// local 实现：LocalStore（localStorage）；remote 实现：RemoteStore（调用 Next.js API + MySQL）。
+// 所有数据方法均为异步，页面通过 await 获取数据。
 
 import type { Todo, TodoPriority, TodoStatus } from "@/lib/todos";
 import type {
@@ -43,15 +44,15 @@ export interface AuthStore {
 }
 
 export interface TodosStore {
-  get(userId: string): Todo[];
-  save(userId: string, list: Todo[]): void;
+  get(userId: string): Promise<Todo[]>;
+  save(userId: string, list: Todo[]): Promise<void>;
   add(
     userId: string,
     data: Omit<Todo, "id" | "userId" | "createdAt" | "status" | "completedAt">
-  ): Todo;
-  update(userId: string, id: string, patch: Partial<Todo>): void;
-  remove(userId: string, id: string): void;
-  toggle(userId: string, id: string): void;
+  ): Promise<Todo>;
+  update(userId: string, id: string, patch: Partial<Todo>): Promise<void>;
+  remove(userId: string, id: string): Promise<void>;
+  toggle(userId: string, id: string): Promise<void>;
 }
 
 export type SleepInput = {
@@ -63,55 +64,55 @@ export type SleepInput = {
 };
 
 export interface HealthStore {
-  getSettings(userId: string): HealthSettings;
-  saveSettings(userId: string, settings: HealthSettings): void;
+  getSettings(userId: string): Promise<HealthSettings>;
+  saveSettings(userId: string, settings: HealthSettings): Promise<void>;
   // 饮水
-  getWaterDays(userId: string): WaterDay[];
-  saveWaterDays(userId: string, days: WaterDay[]): void;
-  addWater(userId: string, amountMl: number, date?: string): void;
+  getWaterDays(userId: string): Promise<WaterDay[]>;
+  saveWaterDays(userId: string, days: WaterDay[]): Promise<void>;
+  addWater(userId: string, amountMl: number, date?: string): Promise<void>;
   // 体重
-  getWeightEntries(userId: string): WeightEntry[];
+  getWeightEntries(userId: string): Promise<WeightEntry[]>;
   addWeightEntry(
     userId: string,
     kg: number,
     date?: string,
     note?: string
-  ): WeightEntry;
-  deleteWeightEntry(userId: string, id: string): void;
+  ): Promise<WeightEntry>;
+  deleteWeightEntry(userId: string, id: string): Promise<void>;
   // 饮食
-  getDietEntries(userId: string, date?: string): DietEntry[];
+  getDietEntries(userId: string, date?: string): Promise<DietEntry[]>;
   addDietEntry(
     userId: string,
     meal: MealType,
     food: string,
     calories?: number,
     date?: string
-  ): DietEntry;
-  deleteDietEntry(userId: string, id: string): void;
+  ): Promise<DietEntry>;
+  deleteDietEntry(userId: string, id: string): Promise<void>;
   // 健身
-  getWorkoutEntries(userId: string, date?: string): WorkoutEntry[];
+  getWorkoutEntries(userId: string, date?: string): Promise<WorkoutEntry[]>;
   addWorkoutEntry(
     userId: string,
     activity: string,
     durationMin: number,
     date?: string
-  ): WorkoutEntry;
+  ): Promise<WorkoutEntry>;
   updateWorkoutEntry(
     userId: string,
     id: string,
     patch: Partial<WorkoutEntry>
-  ): void;
-  deleteWorkoutEntry(userId: string, id: string): void;
+  ): Promise<void>;
+  deleteWorkoutEntry(userId: string, id: string): Promise<void>;
   // 睡眠
-  getSleepEntries(userId: string): SleepEntry[];
-  addSleepEntry(userId: string, data: SleepInput): SleepEntry;
-  updateSleepEntry(userId: string, id: string, patch: Partial<SleepEntry>): void;
-  deleteSleepEntry(userId: string, id: string): void;
+  getSleepEntries(userId: string): Promise<SleepEntry[]>;
+  addSleepEntry(userId: string, data: SleepInput): Promise<SleepEntry>;
+  updateSleepEntry(userId: string, id: string, patch: Partial<SleepEntry>): Promise<void>;
+  deleteSleepEntry(userId: string, id: string): Promise<void>;
 }
 
 export interface NotifyStore {
-  getSettings(userId: string): NotificationSettings;
-  saveSettings(userId: string, settings: NotificationSettings): void;
+  getSettings(userId: string): Promise<NotificationSettings>;
+  saveSettings(userId: string, settings: NotificationSettings): Promise<void>;
   simulatePush(kind: WebhookKind, payload: PushPayload): void;
 }
 

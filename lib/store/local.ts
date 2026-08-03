@@ -1,5 +1,6 @@
-// LocalStore：当前阶段的默认实现，内部复用现有 lib/todos、lib/health、lib/notify 的
-// localStorage 逻辑，行为与原先 100% 一致。鉴权用户存储逻辑从 lib/auth.tsx 迁移至此。
+﻿// LocalStore：本地 localStorage 实现（API_MODE !== "remote" 时使用）。
+// 所有方法已按接口改造为异步（Promise），行为与原先完全一致。
+// 鉴权用户存储逻辑从 lib/auth.tsx 迁移至此。
 
 import { readJSON, writeJSON, genId } from "@/lib/storage";
 import * as todos from "@/lib/todos";
@@ -109,46 +110,96 @@ const authStore: AuthStore = {
 };
 
 const todosStore: TodosStore = {
-  get: (userId) => todos.getTodos(userId),
-  save: (userId, list) => todos.saveTodos(userId, list),
-  add: (userId, data) => todos.addTodo(userId, data),
-  update: (userId, id, patch) => todos.updateTodo(userId, id, patch),
-  remove: (userId, id) => todos.deleteTodo(userId, id),
-  toggle: (userId, id) => todos.toggleTodo(userId, id),
+  async get(userId) {
+    return todos.getTodos(userId);
+  },
+  async save(userId, list) {
+    todos.saveTodos(userId, list);
+  },
+  async add(userId, data) {
+    return todos.addTodo(userId, data);
+  },
+  async update(userId, id, patch) {
+    todos.updateTodo(userId, id, patch);
+  },
+  async remove(userId, id) {
+    todos.deleteTodo(userId, id);
+  },
+  async toggle(userId, id) {
+    todos.toggleTodo(userId, id);
+  },
 };
 
 const healthStore: HealthStore = {
-  getSettings: (userId) => health.getHealthSettings(userId),
-  saveSettings: (userId, settings) => health.saveHealthSettings(userId, settings),
-  getWaterDays: (userId) => health.getWaterDays(userId),
-  saveWaterDays: (userId, days) => health.saveWaterDays(userId, days),
-  addWater: (userId, amountMl, date) => health.addWater(userId, amountMl, date),
-  getWeightEntries: (userId) => health.getWeightEntries(userId),
-  addWeightEntry: (userId, kg, date, note) =>
-    health.addWeightEntry(userId, kg, date, note),
-  deleteWeightEntry: (userId, id) => health.deleteWeightEntry(userId, id),
-  getDietEntries: (userId, date) => health.getDietEntries(userId, date),
-  addDietEntry: (userId, meal, food, calories, date) =>
-    health.addDietEntry(userId, meal, food, calories, date),
-  deleteDietEntry: (userId, id) => health.deleteDietEntry(userId, id),
-  getWorkoutEntries: (userId, date) => health.getWorkoutEntries(userId, date),
-  addWorkoutEntry: (userId, activity, durationMin, date) =>
-    health.addWorkoutEntry(userId, activity, durationMin, date),
-  updateWorkoutEntry: (userId, id, patch) =>
-    health.updateWorkoutEntry(userId, id, patch),
-  deleteWorkoutEntry: (userId, id) => health.deleteWorkoutEntry(userId, id),
-  getSleepEntries: (userId) => health.getSleepEntries(userId),
-  addSleepEntry: (userId, data) => health.addSleepEntry(userId, data),
-  updateSleepEntry: (userId, id, patch) =>
-    health.updateSleepEntry(userId, id, patch),
-  deleteSleepEntry: (userId, id) => health.deleteSleepEntry(userId, id),
+  async getSettings(userId) {
+    return health.getHealthSettings(userId);
+  },
+  async saveSettings(userId, settings) {
+    health.saveHealthSettings(userId, settings);
+  },
+  async getWaterDays(userId) {
+    return health.getWaterDays(userId);
+  },
+  async saveWaterDays(userId, days) {
+    health.saveWaterDays(userId, days);
+  },
+  async addWater(userId, amountMl, date) {
+    health.addWater(userId, amountMl, date);
+  },
+  async getWeightEntries(userId) {
+    return health.getWeightEntries(userId);
+  },
+  async addWeightEntry(userId, kg, date, note) {
+    return health.addWeightEntry(userId, kg, date, note);
+  },
+  async deleteWeightEntry(userId, id) {
+    health.deleteWeightEntry(userId, id);
+  },
+  async getDietEntries(userId, date) {
+    return health.getDietEntries(userId, date);
+  },
+  async addDietEntry(userId, meal, food, calories, date) {
+    return health.addDietEntry(userId, meal, food, calories, date);
+  },
+  async deleteDietEntry(userId, id) {
+    health.deleteDietEntry(userId, id);
+  },
+  async getWorkoutEntries(userId, date) {
+    return health.getWorkoutEntries(userId, date);
+  },
+  async addWorkoutEntry(userId, activity, durationMin, date) {
+    return health.addWorkoutEntry(userId, activity, durationMin, date);
+  },
+  async updateWorkoutEntry(userId, id, patch) {
+    health.updateWorkoutEntry(userId, id, patch);
+  },
+  async deleteWorkoutEntry(userId, id) {
+    health.deleteWorkoutEntry(userId, id);
+  },
+  async getSleepEntries(userId) {
+    return health.getSleepEntries(userId);
+  },
+  async addSleepEntry(userId, data) {
+    return health.addSleepEntry(userId, data);
+  },
+  async updateSleepEntry(userId, id, patch) {
+    health.updateSleepEntry(userId, id, patch);
+  },
+  async deleteSleepEntry(userId, id) {
+    health.deleteSleepEntry(userId, id);
+  },
 };
 
 const notifyStore: NotifyStore = {
-  getSettings: (userId) => notify.getNotificationSettings(userId),
-  saveSettings: (userId, settings) =>
-    notify.saveNotificationSettings(userId, settings),
-  simulatePush: (kind, payload) => notify.simulatePush(kind, payload),
+  async getSettings(userId) {
+    return notify.getNotificationSettings(userId);
+  },
+  async saveSettings(userId, settings) {
+    notify.saveNotificationSettings(userId, settings);
+  },
+  simulatePush(kind, payload) {
+    notify.simulatePush(kind, payload);
+  },
 };
 
 export function createLocalStore(): Store {

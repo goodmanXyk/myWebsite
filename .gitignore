@@ -6,3 +6,5 @@ out
 next-env.d.ts
 *.tsbuildinfo
 .workbuddy/
+
+.env*.local

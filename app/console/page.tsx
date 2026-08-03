@@ -39,36 +39,46 @@ export default function ConsoleHome() {
 
   useEffect(() => {
     if (!user) return;
-    const uid = user.id;
-    const now = Date.now();
-    const today = todayKey();
+    (async () => {
+      const uid = user.id;
+      const now = Date.now();
+      const today = todayKey();
 
-    const todos = store.todos.get(uid);
-    const pending = todos.filter((t) => t.status === "pending");
-    const overdue = pending.filter((t) => t.due != null && t.due < now);
-    const doneToday = todos.filter(
-      (t) => t.status === "completed" && t.completedAt && todayKey(new Date(t.completedAt)) === today
-    );
+      const [todos, waterSettings, waterDays, workoutsToday, weights] = await Promise.all([
+        store.todos.get(uid),
+        store.health.getSettings(uid),
+        store.health.getWaterDays(uid),
+        store.health.getWorkoutEntries(uid, today),
+        store.health.getWeightEntries(uid),
+      ]);
 
-    const waterSettings = store.health.getSettings(uid);
-    const waterToday = store.health.getWaterDays(uid).find((d) => d.date === today);
-    const percent = waterSettings.waterTargetMl
-      ? Math.round(((waterToday?.amountMl ?? 0) / waterSettings.waterTargetMl) * 100)
-      : 0;
+      const pending = todos.filter((t) => t.status === "pending");
+      const overdue = pending.filter((t) => t.due != null && t.due < now);
+      const doneToday = todos.filter(
+        (t) => t.status === "completed" && t.completedAt && todayKey(new Date(t.completedAt)) === today
+      );
 
-    const workoutsToday = store.health.getWorkoutEntries(uid, today).filter((w) => w.done);
-    const weights = store.health.getWeightEntries(uid);
-    const latestWeight = weights.length
-      ? `${weights[weights.length - 1].kg} kg`
-      : "—";
+      const waterToday = waterDays.find((d) => d.date === today);
+      const percent = waterSettings.waterTargetMl
+        ? Math.round(((waterToday?.amountMl ?? 0) / waterSettings.waterTargetMl) * 100)
+        : 0;
 
-    setSummary({
-      todoPending: pending.length,
-      todoOverdue: overdue.length,
-      todoDoneToday: doneToday.length,
-      waterPercent: percent,
-      workoutDone: workoutsToday.length,
-      latestWeight,
+      const doneWorkouts = workoutsToday.filter((w) => w.done);
+      const latestWeight = weights.length
+        ? `${weights[weights.length - 1].kg} kg`
+        : "—";
+
+      setSummary({
+        todoPending: pending.length,
+        todoOverdue: overdue.length,
+        todoDoneToday: doneToday.length,
+        waterPercent: percent,
+        workoutDone: doneWorkouts.length,
+        latestWeight,
+      });
+    })().catch((e) => {
+      console.error("加载概览失败", e);
+      setSummary(emptySummary);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
