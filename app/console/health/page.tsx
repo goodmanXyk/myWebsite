@@ -620,7 +620,7 @@ export default function HealthPage() {
                               show(err instanceof Error ? err.message : "删除失败", "warning");
                             }
                           }}
-                          className="text-xs text-red-500 hover:underline"
+                          className="inline-flex items-center rounded-lg border border-red-500/15 px-2.5 py-1 text-xs text-red-400 transition-colors hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
                         >
                           删除
                         </button>
@@ -705,7 +705,7 @@ export default function HealthPage() {
                                       show(err instanceof Error ? err.message : "删除失败", "warning");
                                     }
                                   }}
-                                  className="text-xs text-red-500 hover:underline"
+                                  className="inline-flex items-center rounded-lg border border-red-500/15 px-2.5 py-1 text-xs text-red-400 transition-colors hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
                                 >
                                   删除
                                 </button>
@@ -820,7 +820,7 @@ export default function HealthPage() {
                               show(err instanceof Error ? err.message : "删除失败", "warning");
                             }
                           }}
-                          className="text-xs text-red-500 hover:underline"
+                          className="inline-flex items-center rounded-lg border border-red-500/15 px-2.5 py-1 text-xs text-red-400 transition-colors hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
                         >
                           删除
                         </button>
@@ -931,7 +931,7 @@ export default function HealthPage() {
                               show(err instanceof Error ? err.message : "删除失败", "warning");
                             }
                           }}
-                          className="text-xs text-red-500 hover:underline"
+                          className="inline-flex items-center rounded-lg border border-red-500/15 px-2.5 py-1 text-xs text-red-400 transition-colors hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
                         >
                           删除
                         </button>

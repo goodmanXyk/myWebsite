@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Modal } from "@/components/ui/Modal";
+import { DateTimePicker } from "@/components/ui/DateTimePicker";
 import { Card } from "@/components/ui/Card";
 
 const store = getStore();
@@ -332,13 +333,13 @@ export default function TodosPage() {
                 <div className="flex shrink-0 items-center gap-1">
                   <button
                     onClick={() => openEdit(t)}
-                    className="rounded-md px-2 py-1 text-xs text-muted transition-colors hover:bg-white/10 hover:text-ink"
+                    className="inline-flex items-center rounded-lg border border-white/10 px-2.5 py-1 text-xs text-muted transition-colors hover:border-white/20 hover:bg-white/5 hover:text-white"
                   >
                     编辑
                   </button>
                   <button
                     onClick={() => handleDelete(t)}
-                    className="rounded-md px-2 py-1 text-xs text-red-500 transition-colors hover:bg-red-50"
+                    className="inline-flex items-center rounded-lg border border-red-500/15 px-2.5 py-1 text-xs text-red-400 transition-colors hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
                   >
                     删除
                   </button>
@@ -366,11 +367,10 @@ export default function TodosPage() {
             rows={3}
           />
           <div className="grid grid-cols-2 gap-4">
-            <Input
+            <DateTimePicker
               label="截止时间 / Due（可选）"
-              type="datetime-local"
               value={form.due}
-              onChange={(e) => setForm({ ...form, due: e.target.value })}
+              onChange={(v) => setForm({ ...form, due: v })}
             />
             <Dropdown
               label="优先级 / Priority"
