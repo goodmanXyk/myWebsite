@@ -8,6 +8,7 @@ import type { Notebook, Note, NoteSummary } from "@/lib/store";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Dropdown } from "@/components/ui/Dropdown";
+import { ContextMenu } from "@/components/ui/ContextMenu";
 import { Card } from "@/components/ui/Card";
 import { MarkdownView } from "@/components/ui/MarkdownView";
 import { RichTextEditor } from "@/components/console/RichTextEditor";
@@ -63,6 +64,9 @@ export default function NotesPage() {
       return next;
     });
   };
+
+  // 右键菜单
+  const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; notebook: Notebook } | null>(null);
 
   // 新建/重命名知识库
   const [nbModalOpen, setNbModalOpen] = useState(false);
@@ -306,25 +310,16 @@ export default function NotesPage() {
             className={`group flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors ${
               filter === nb.id ? "bg-white/10 font-medium text-ink" : "text-muted hover:bg-white/[0.04] hover:text-ink"
             }`}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              setCtxMenu({ x: e.clientX, y: e.clientY, notebook: nb });
+            }}
+            title="右键：重命名 / 删除"
           >
             <button className="min-w-0 flex-1 text-left" onClick={() => selectFilter(nb.id)}>
               <span className="truncate">📚 {nb.name}</span>
               <span className="ml-1 text-xs text-muted">{nb.noteCount}</span>
             </button>
-            <div className="hidden shrink-0 gap-1 group-hover:flex">
-              <button
-                onClick={() => openNbModal(nb)}
-                className="rounded-md px-1.5 py-0.5 text-xs text-muted transition-colors hover:bg-white/5 hover:text-white"
-              >
-                改
-              </button>
-              <button
-                onClick={() => deleteNotebook(nb)}
-                className="rounded-md px-1.5 py-0.5 text-xs text-muted transition-colors hover:bg-white/5 hover:text-red-300"
-              >
-                删
-              </button>
-            </div>
           </div>
         ))}
         {!loaded ? <p className="px-3 py-4 text-xs text-muted">加载中…</p> : null}
@@ -500,6 +495,19 @@ export default function NotesPage() {
           </Card>
         )}
       </div>
+
+      {/* 右键菜单 */}
+      {ctxMenu && (
+        <ContextMenu
+          x={ctxMenu.x}
+          y={ctxMenu.y}
+          onClose={() => setCtxMenu(null)}
+          items={[
+            { label: "重命名", icon: "✎", onClick: () => openNbModal(ctxMenu.notebook) },
+            { label: "删除", icon: "🗑", danger: true, onClick: () => deleteNotebook(ctxMenu.notebook) },
+          ]}
+        />
+      )}
 
       {/* 新建/重命名知识库弹窗 */}
       {nbModalOpen && (
