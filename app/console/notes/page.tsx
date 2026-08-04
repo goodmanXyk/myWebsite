@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { getStore } from "@/lib/store";
@@ -9,8 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { MarkdownView } from "@/components/ui/MarkdownView";
-import { MarkdownToolbar } from "@/components/ui/MarkdownToolbar";
-import { applyMarkdownAction, type MarkdownAction } from "@/lib/markdown";
+import { RichTextEditor } from "@/components/console/RichTextEditor";
 
 const store = getStore();
 
@@ -39,19 +38,6 @@ export default function NotesPage() {
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [mode, setMode] = useState<Mode>("edit");
-  const editorRef = useRef<HTMLTextAreaElement>(null);
-
-  const handleToolbarAction = (action: MarkdownAction) => {
-    const el = editorRef.current;
-    if (!el) return;
-    const res = applyMarkdownAction(action, content, el.selectionStart, el.selectionEnd);
-    setContent(res.value);
-    setDirty(true);
-    requestAnimationFrame(() => {
-      el.focus();
-      el.setSelectionRange(res.selStart, res.selEnd);
-    });
-  };
 
   // 新建/重命名知识库
   const [nbModalOpen, setNbModalOpen] = useState(false);
@@ -112,6 +98,18 @@ export default function NotesPage() {
       show(e instanceof Error ? e.message : "加载文档失败", "warning");
     }
   };
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s" && note) {
+        e.preventDefault();
+        saveNote();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [note, dirty, title]);
 
   const saveNote = async () => {
     if (!user || !note) return;
@@ -386,31 +384,24 @@ export default function NotesPage() {
               />
             </div>
 
-            {mode !== "preview" && <MarkdownToolbar onAction={handleToolbarAction} />}
-
-            <div className={`grid ${mode === "split" ? "grid-cols-2" : "grid-cols-1"} min-h-[420px]`}>
+            <div className={`grid ${mode === "split" ? "grid-cols-2" : "grid-cols-1"}`}>
               {mode !== "preview" && (
-                <textarea
-                  ref={editorRef}
+                <RichTextEditor
+                  key={note.id}
                   value={content}
-                  onChange={(e) => {
-                    setContent(e.target.value);
+                  onChange={(md) => {
+                    setContent(md);
                     setDirty(true);
                   }}
-                  placeholder={"支持 Markdown：标题、列表、表格、代码块、任务清单…\n\n用 Ctrl/Cmd + S 快速保存"}
-                  className={`h-[420px] w-full resize-none bg-transparent px-4 pb-4 font-mono text-sm leading-6 text-ink outline-none placeholder:text-muted/50 ${
-                    mode === "split" ? "border-r border-line" : ""
-                  }`}
-                  onKeyDown={(e) => {
-                    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
-                      e.preventDefault();
-                      saveNote();
-                    }
-                  }}
+                  placeholder="开始书写，支持 Markdown…"
                 />
               )}
-              {mode !== "edit" && (
-                <div className="max-h-[420px] overflow-y-auto px-4 pb-4">
+              {(mode === "split" || mode === "preview") && (
+                <div
+                  className={`${
+                    mode === "split" ? "max-h-[520px] overflow-y-auto border-l border-line" : "min-h-[420px]"
+                  } px-4 py-3`}
+                >
                   <MarkdownView content={content} />
                 </div>
               )}
