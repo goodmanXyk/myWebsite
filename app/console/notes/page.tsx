@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { getStore } from "@/lib/store";
@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { MarkdownView } from "@/components/ui/MarkdownView";
+import { MarkdownToolbar } from "@/components/ui/MarkdownToolbar";
+import { applyMarkdownAction, type MarkdownAction } from "@/lib/markdown";
 
 const store = getStore();
 
@@ -37,6 +39,19 @@ export default function NotesPage() {
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [mode, setMode] = useState<Mode>("edit");
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleToolbarAction = (action: MarkdownAction) => {
+    const el = editorRef.current;
+    if (!el) return;
+    const res = applyMarkdownAction(action, content, el.selectionStart, el.selectionEnd);
+    setContent(res.value);
+    setDirty(true);
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(res.selStart, res.selEnd);
+    });
+  };
 
   // 新建/重命名知识库
   const [nbModalOpen, setNbModalOpen] = useState(false);
@@ -371,9 +386,12 @@ export default function NotesPage() {
               />
             </div>
 
+            {mode !== "preview" && <MarkdownToolbar onAction={handleToolbarAction} />}
+
             <div className={`grid ${mode === "split" ? "grid-cols-2" : "grid-cols-1"} min-h-[420px]`}>
               {mode !== "preview" && (
                 <textarea
+                  ref={editorRef}
                   value={content}
                   onChange={(e) => {
                     setContent(e.target.value);
