@@ -27,8 +27,8 @@ export function Input({
       )}
       <input
         id={inputId}
-        className={`w-full rounded-xl border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-colors duration-150 placeholder:text-muted/70 hover:border-muted focus:border-brand focus:ring-2 focus:ring-brand/20 [color-scheme:light] ${
-          hasError ? "border-red-400" : "border-line"
+        className={`w-full rounded-xl border bg-white/[0.03] px-3.5 py-2.5 text-sm text-ink outline-none transition-all duration-150 placeholder:text-muted/60 hover:border-white/20 focus:border-white/40 focus:ring-2 focus:ring-white/10 [color-scheme:dark] ${
+          hasError ? "border-red-400/70" : "border-white/10"
         } ${className}`}
         {...props}
       />

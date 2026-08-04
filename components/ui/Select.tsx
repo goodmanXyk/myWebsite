@@ -30,8 +30,8 @@ export function Select({
       <div className="relative">
         <select
           id={selectId}
-          className={`w-full appearance-none rounded-xl border bg-surface pl-3.5 pr-10 py-2.5 text-sm text-ink outline-none transition-colors duration-150 hover:border-muted focus:border-brand focus:ring-2 focus:ring-brand/20 [color-scheme:light] ${
-            hasError ? "border-red-400" : "border-line"
+          className={`w-full appearance-none rounded-xl border bg-white/[0.03] pl-3.5 pr-10 py-2.5 text-sm text-ink outline-none transition-all duration-150 hover:border-white/20 focus:border-white/40 focus:ring-2 focus:ring-white/10 [color-scheme:dark] ${
+            hasError ? "border-red-400/70" : "border-white/10"
           } ${className}`}
           {...props}
         >
