@@ -35,7 +35,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`animate-toast-in motion-reduce:animate-none rounded-lg border border-line bg-white px-4 py-3 text-sm text-ink shadow-lg ${
+            className={`animate-toast-in motion-reduce:animate-none rounded-lg border border-line bg-surface px-4 py-3 text-sm text-ink shadow-lg ${
               t.type === "warning" ? "border-l-4 border-l-brand" : ""
             }`}
           >

@@ -276,7 +276,7 @@ export default function NotesPage() {
             <button
               onClick={() => toggleCollapse("left")}
               title="收起知识库面板"
-              className="hidden h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-gray-100 hover:text-ink lg:flex"
+              className="hidden h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-white/10 hover:text-ink lg:flex"
             >
               ‹
             </button>
@@ -285,7 +285,7 @@ export default function NotesPage() {
         <button
           onClick={() => selectFilter("all")}
           className={`rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-            filter === "all" ? "bg-gray-100 font-medium text-ink" : "text-muted hover:bg-gray-50 hover:text-ink"
+            filter === "all" ? "bg-white/10 font-medium text-ink" : "text-muted hover:bg-white/[0.04] hover:text-ink"
           }`}
         >
           📄 全部文档
@@ -293,7 +293,7 @@ export default function NotesPage() {
         <button
           onClick={() => selectFilter("none")}
           className={`rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-            filter === "none" ? "bg-gray-100 font-medium text-ink" : "text-muted hover:bg-gray-50 hover:text-ink"
+            filter === "none" ? "bg-white/10 font-medium text-ink" : "text-muted hover:bg-white/[0.04] hover:text-ink"
           }`}
         >
           📥 未分类
@@ -303,7 +303,7 @@ export default function NotesPage() {
           <div
             key={nb.id}
             className={`group flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors ${
-              filter === nb.id ? "bg-gray-100 font-medium text-ink" : "text-muted hover:bg-gray-50 hover:text-ink"
+              filter === nb.id ? "bg-white/10 font-medium text-ink" : "text-muted hover:bg-white/[0.04] hover:text-ink"
             }`}
           >
             <button className="min-w-0 flex-1 text-left" onClick={() => selectFilter(nb.id)}>
@@ -314,7 +314,7 @@ export default function NotesPage() {
               <button className="text-xs text-muted hover:text-ink" onClick={() => openNbModal(nb)}>
                 改
               </button>
-              <button className="text-xs text-red-500 hover:text-red-600" onClick={() => deleteNotebook(nb)}>
+              <button className="text-xs text-red-500 hover:text-red-400" onClick={() => deleteNotebook(nb)}>
                 删
               </button>
             </div>
@@ -328,7 +328,7 @@ export default function NotesPage() {
           <button
             onClick={() => toggleCollapse("left")}
             title="展开知识库面板"
-            className="flex h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-gray-100 hover:text-ink"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-white/10 hover:text-ink"
           >
             »
           </button>
@@ -347,7 +347,7 @@ export default function NotesPage() {
             <button
               onClick={() => toggleCollapse("middle")}
               title="收起文档列表"
-              className="hidden h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-gray-100 hover:text-ink lg:flex"
+              className="hidden h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-white/10 hover:text-ink lg:flex"
             >
               ‹
             </button>
@@ -365,7 +365,7 @@ export default function NotesPage() {
               <div
                 key={n.id}
                 className={`group rounded-lg border px-3 py-2 transition-colors ${
-                  note?.id === n.id ? "border-brand bg-brand/5" : "border-transparent hover:border-line hover:bg-white"
+                  note?.id === n.id ? "border-brand bg-brand/5" : "border-transparent hover:border-line hover:bg-surface"
                 }`}
               >
                 <button className="block w-full text-left" onClick={() => openNote(n.id)}>
@@ -391,7 +391,7 @@ export default function NotesPage() {
           <button
             onClick={() => toggleCollapse("middle")}
             title="展开文档列表"
-            className="flex h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-gray-100 hover:text-ink"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-white/10 hover:text-ink"
           >
             »
           </button>
@@ -416,7 +416,7 @@ export default function NotesPage() {
                 <select
                   value={note.notebookId ?? ""}
                   onChange={(e) => moveNote(e.target.value)}
-                  className="rounded-lg border border-line bg-white px-2 py-1 text-xs text-muted outline-none focus:border-ink"
+                  className="rounded-lg border border-line bg-surface px-2 py-1 text-xs text-muted outline-none focus:border-ink"
                 >
                   <option value="">未分类</option>
                   {notebooks.map((nb) => (
@@ -467,7 +467,7 @@ export default function NotesPage() {
                 <select
                   value={note.notebookId ?? ""}
                   onChange={(e) => moveNote(e.target.value)}
-                  className="rounded-lg border border-line bg-white px-2 py-1 text-xs text-muted outline-none focus:border-ink"
+                  className="rounded-lg border border-line bg-surface px-2 py-1 text-xs text-muted outline-none focus:border-ink"
                 >
                   <option value="">未分类</option>
                   {notebooks.map((nb) => (
@@ -496,8 +496,8 @@ export default function NotesPage() {
 
       {/* 新建/重命名知识库弹窗 */}
       {nbModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setNbModalOpen(false)}>
-          <div className="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setNbModalOpen(false)}>
+          <div className="w-full max-w-sm rounded-xl bg-surface p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-base font-semibold text-ink">{nbEditing ? "重命名知识库" : "新建知识库"}</h3>
             <div className="mt-4">
               <Input

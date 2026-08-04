@@ -59,7 +59,7 @@ export function NotificationBell() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-white text-muted transition-colors hover:text-ink"
+        className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-surface text-muted transition-colors hover:text-ink"
         aria-label="待办提醒"
       >
         <span className="text-base leading-none">🔔</span>
@@ -70,7 +70,7 @@ export function NotificationBell() {
         )}
       </button>
       {open && (
-        <div className="absolute right-0 top-10 z-50 w-72 overflow-hidden rounded-lg border border-line bg-white shadow-lg">
+        <div className="absolute right-0 top-10 z-50 w-72 overflow-hidden rounded-lg border border-line bg-surface shadow-lg">
           <div className="border-b border-line px-3 py-2 text-sm font-medium text-ink">
             待办提醒
           </div>
@@ -84,7 +84,7 @@ export function NotificationBell() {
                   <li key={t.id}>
                     <Link
                       href="/console/todos"
-                      className="block px-3 py-2 transition-colors hover:bg-gray-50"
+                      className="block px-3 py-2 transition-colors hover:bg-white/[0.04]"
                     >
                       <span className="block truncate text-sm text-ink">{t.title}</span>
                       <span className={`text-xs ${overdue ? "text-red-500" : "text-muted"}`}>

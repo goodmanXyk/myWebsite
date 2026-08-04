@@ -3,12 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --bg: #ffffff;
-  --canvas: #fafafa;
-  --ink: #0d0d0d;
-  --muted: #6b6b6b;
-  --line: #e5e5e5;
+  --bg: #000000;
+  --canvas: #000000;
+  --ink: #f5f5f5;
+  --muted: #a1a1a1;
+  --line: #262626;
   --brand: #10a37f;
+  --surface: #111111;
   /* 系统字体栈：优先使用设备上最接近 Inter 的无衬线字体，构建期无需联网拉取字体 */
   --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB",
@@ -94,10 +95,30 @@ a {
   animation: slide-in-left 0.22s ease-out;
 }
 
-/* 原生日期/时间控件在浅色主题下呈现浅色 */
+/* 原生日期/时间控件跟随暗色主题 */
 input[type="date"],
-input[type="datetime-local"] {
-  color-scheme: light;
+input[type="datetime-local"],
+input[type="time"] {
+  color-scheme: dark;
+}
+
+/* 暗色滚动条 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444444;
+}
+::selection {
+  background: rgba(16, 163, 127, 0.35);
 }
 
 /* 无障碍：尊重用户的减少动效偏好 */
@@ -116,7 +137,7 @@ input[type="datetime-local"] {
 .markdown-body {
   font-size: 14px;
   line-height: 1.75;
-  color: #0d0d0d;
+  color: #f5f5f5;
   word-break: break-word;
 }
 .markdown-body h1,
@@ -127,8 +148,8 @@ input[type="datetime-local"] {
   margin: 1.2em 0 0.6em;
   line-height: 1.4;
 }
-.markdown-body h1 { font-size: 1.6em; padding-bottom: 0.3em; border-bottom: 1px solid #e5e5e5; }
-.markdown-body h2 { font-size: 1.35em; padding-bottom: 0.25em; border-bottom: 1px solid #e5e5e5; }
+.markdown-body h1 { font-size: 1.6em; padding-bottom: 0.3em; border-bottom: 1px solid #262626; }
+.markdown-body h2 { font-size: 1.35em; padding-bottom: 0.25em; border-bottom: 1px solid #262626; }
 .markdown-body h3 { font-size: 1.15em; }
 .markdown-body h4 { font-size: 1em; }
 .markdown-body p { margin: 0.6em 0; }
@@ -142,19 +163,20 @@ input[type="datetime-local"] {
   margin: 0.8em 0;
   padding: 0.2em 1em;
   border-left: 3px solid #10a37f;
-  color: #6b6b6b;
-  background: #fafafa;
+  color: #a1a1a1;
+  background: rgba(255, 255, 255, 0.04);
 }
 .markdown-body code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.9em;
-  background: #f2f2f2;
+  background: rgba(255, 255, 255, 0.1);
   padding: 0.15em 0.4em;
   border-radius: 4px;
 }
 .markdown-body pre {
   background: #0d0d0d;
-  color: #fafafa;
+  border: 1px solid #262626;
+  color: #f5f5f5;
   padding: 0.9em 1em;
   border-radius: 8px;
   overflow-x: auto;
@@ -172,19 +194,19 @@ input[type="datetime-local"] {
   font-size: 0.95em;
 }
 .markdown-body th, .markdown-body td {
-  border: 1px solid #e5e5e5;
+  border: 1px solid #2a2a2a;
   padding: 0.45em 0.8em;
   text-align: left;
 }
-.markdown-body th { background: #fafafa; font-weight: 600; }
-.markdown-body hr { border: none; border-top: 1px solid #e5e5e5; margin: 1.2em 0; }
+.markdown-body th { background: rgba(255, 255, 255, 0.05); font-weight: 600; }
+.markdown-body hr { border: none; border-top: 1px solid #262626; margin: 1.2em 0; }
 .markdown-body img { max-width: 100%; border-radius: 8px; }
 
 /* ===== 富文本编辑器（TipTap / ProseMirror）===== */
 .rich-editor {
   font-size: 15px;
   line-height: 1.8;
-  color: #0d0d0d;
+  color: #f5f5f5;
   min-height: 420px;
   outline: none;
   word-break: break-word;
@@ -194,8 +216,8 @@ input[type="datetime-local"] {
   margin: 1.1em 0 0.5em;
   line-height: 1.4;
 }
-.rich-editor h1 { font-size: 1.6em; padding-bottom: 0.3em; border-bottom: 1px solid #e5e5e5; }
-.rich-editor h2 { font-size: 1.35em; padding-bottom: 0.25em; border-bottom: 1px solid #e5e5e5; }
+.rich-editor h1 { font-size: 1.6em; padding-bottom: 0.3em; border-bottom: 1px solid #262626; }
+.rich-editor h2 { font-size: 1.35em; padding-bottom: 0.25em; border-bottom: 1px solid #262626; }
 .rich-editor h3 { font-size: 1.15em; }
 .rich-editor h4 { font-size: 1em; }
 .rich-editor p { margin: 0.5em 0; }
@@ -208,19 +230,20 @@ input[type="datetime-local"] {
   margin: 0.7em 0;
   padding: 0.2em 1em;
   border-left: 3px solid #10a37f;
-  color: #6b6b6b;
-  background: #fafafa;
+  color: #a1a1a1;
+  background: rgba(255, 255, 255, 0.04);
 }
 .rich-editor code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.9em;
-  background: #f2f2f2;
+  background: rgba(255, 255, 255, 0.1);
   padding: 0.15em 0.4em;
   border-radius: 4px;
 }
 .rich-editor pre {
   background: #0d0d0d;
-  color: #fafafa;
+  border: 1px solid #262626;
+  color: #f5f5f5;
   padding: 0.9em 1em;
   border-radius: 8px;
   overflow-x: auto;
@@ -228,25 +251,25 @@ input[type="datetime-local"] {
 }
 .rich-editor pre code { background: transparent; color: inherit; padding: 0; }
 .rich-editor img { max-width: 100%; border-radius: 8px; }
-.rich-editor hr { border: none; border-top: 1px solid #e5e5e5; margin: 1.2em 0; }
+.rich-editor hr { border: none; border-top: 1px solid #262626; margin: 1.2em 0; }
 
 /* 任务清单 */
 .rich-editor ul[data-type="taskList"] { list-style: none; padding-left: 0; }
 .rich-editor ul[data-type="taskList"] li { display: flex; align-items: flex-start; }
 .rich-editor ul[data-type="taskList"] li > label { flex: 0 0 auto; margin: 0.35em 0.5em 0 0; user-select: none; }
 .rich-editor ul[data-type="taskList"] li > div { flex: 1 1 auto; }
-.rich-editor ul[data-type="taskList"] li[data-checked="true"] > div { text-decoration: line-through; color: #6b6b6b; }
+.rich-editor ul[data-type="taskList"] li[data-checked="true"] > div { text-decoration: line-through; color: #8a8a8a; }
 
 /* 表格 */
 .rich-editor table { border-collapse: collapse; table-layout: fixed; width: 100%; margin: 0.8em 0; }
 .rich-editor th, .rich-editor td {
-  border: 1px solid #d9d9d9;
+  border: 1px solid #2a2a2a;
   padding: 0.4em 0.7em;
   min-width: 3em;
   position: relative;
   vertical-align: top;
 }
-.rich-editor th { background: #fafafa; font-weight: 600; text-align: left; }
+.rich-editor th { background: rgba(255, 255, 255, 0.05); font-weight: 600; text-align: left; }
 .rich-editor .selectedCell::after {
   content: "";
   position: absolute;

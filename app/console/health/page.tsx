@@ -59,8 +59,8 @@ const qualityLabel: Record<SleepQuality, string> = {
 
 const qualityBadge: Record<SleepQuality, string> = {
   good: "bg-brand/10 text-brand border border-brand/30",
-  fair: "bg-amber-50 text-amber-600 border border-amber-200",
-  poor: "bg-red-50 text-red-600 border border-red-200",
+  fair: "bg-amber-500/10 text-amber-400 border border-amber-500/30",
+  poor: "bg-red-500/10 text-red-400 border border-red-500/30",
 };
 
 function fmtDuration(min: number): string {
@@ -459,7 +459,7 @@ export default function HealthPage() {
       </div>
 
       {/* 共享日期选择器 */}
-      <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-line bg-white px-4 py-3">
+      <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3">
         <Input
           type="date"
           value={selectedDate}
@@ -479,8 +479,8 @@ export default function HealthPage() {
             onClick={() => setTab(t.key)}
             className={`shrink-0 whitespace-nowrap rounded-lg border px-4 py-2 text-sm transition-colors ${
               tab === t.key
-                ? "border-ink bg-ink text-white"
-                : "border-line bg-white text-muted hover:text-ink"
+                ? "border-ink bg-white text-black"
+                : "border-line bg-surface text-muted hover:text-ink"
             }`}
           >
             {t.icon} {t.label}

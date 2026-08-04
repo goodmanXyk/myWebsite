@@ -33,9 +33,9 @@ const priorityOptions: { value: TodoPriority; label: string }[] = [
 ];
 
 const priorityBadge: Record<TodoPriority, string> = {
-  high: "bg-red-50 text-red-600 border border-red-200",
-  medium: "bg-amber-50 text-amber-600 border border-amber-200",
-  low: "bg-gray-100 text-muted border border-line",
+  high: "bg-red-500/10 text-red-400 border border-red-500/30",
+  medium: "bg-amber-500/10 text-amber-400 border border-amber-500/30",
+  low: "bg-white/10 text-muted border border-line",
 };
 
 const priorityLabel: Record<TodoPriority, string> = {
@@ -248,14 +248,14 @@ export default function TodosPage() {
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
-        <div className="inline-flex rounded-xl border border-line bg-white p-1">
+        <div className="inline-flex rounded-xl border border-line bg-surface p-1">
           {timeFilterOptions.map((o) => (
             <button
               key={o.value}
               onClick={() => setTimeFilter(o.value)}
               className={`rounded-lg px-3 py-1.5 text-sm transition-colors ${
                 timeFilter === o.value
-                  ? "bg-ink text-white"
+                  ? "bg-white text-black"
                   : "text-muted hover:text-ink"
               }`}
             >
@@ -332,7 +332,7 @@ export default function TodosPage() {
                 <div className="flex shrink-0 items-center gap-1">
                   <button
                     onClick={() => openEdit(t)}
-                    className="rounded-md px-2 py-1 text-xs text-muted transition-colors hover:bg-gray-100 hover:text-ink"
+                    className="rounded-md px-2 py-1 text-xs text-muted transition-colors hover:bg-white/10 hover:text-ink"
                   >
                     编辑
                   </button>

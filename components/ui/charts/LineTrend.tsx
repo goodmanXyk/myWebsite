@@ -32,14 +32,15 @@ export function LineTrend({
           data={data}
           margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-          <XAxis dataKey="label" tick={{ fontSize: 12 }} stroke="#6b6b6b" />
-          <YAxis tick={{ fontSize: 12 }} stroke="#6b6b6b" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
+          <XAxis dataKey="label" tick={{ fontSize: 12, fill: "#a1a1a1" }} stroke="#3a3a3a" />
+          <YAxis tick={{ fontSize: 12, fill: "#a1a1a1" }} stroke="#3a3a3a" />
           <Tooltip
             contentStyle={{
-              borderRadius: 8,
-              border: "1px solid #e5e5e5",
-              background: "#fff",
+              borderRadius: 12,
+              border: "1px solid #2a2a2a",
+              background: "#1a1a1a",
+              color: "#f5f5f5",
             }}
           />
           <Line

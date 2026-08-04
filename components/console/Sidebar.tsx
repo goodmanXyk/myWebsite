@@ -31,7 +31,7 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   return (
-    <aside className="flex h-full w-60 flex-col border-r border-line bg-white">
+    <aside className="flex h-full w-60 flex-col border-r border-line bg-surface">
       <div className="flex h-14 items-center border-b border-line px-4">
         <Logo />
       </div>
@@ -49,8 +49,8 @@ export function Sidebar({
                   onClick={onNavigate}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                     active
-                      ? "bg-gray-100 font-medium text-ink"
-                      : "text-muted hover:bg-gray-50 hover:text-ink"
+                      ? "bg-white/10 font-medium text-ink"
+                      : "text-muted hover:bg-white/[0.04] hover:text-ink"
                   }`}
                 >
                   <span className="w-4 text-center">{item.icon}</span>
@@ -63,7 +63,7 @@ export function Sidebar({
       </nav>
       <div className="border-t border-line p-3">
         <div className="flex items-center gap-3 rounded-lg px-2 py-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ink text-xs font-semibold text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-xs font-semibold text-black">
             {initials(user)}
           </span>
           <div className="min-w-0 flex-1">

@@ -15,13 +15,13 @@ export function SiteNavbar() {
   const close = () => setMenuOpen(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-white/80 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-line bg-surface/80 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-ink transition-colors hover:bg-gray-100 md:hidden"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-ink transition-colors hover:bg-white/10 md:hidden"
             aria-label="打开菜单"
           >
             <span className="text-lg leading-none">☰</span>
@@ -63,33 +63,33 @@ export function SiteNavbar() {
 
       {/* 移动端下拉菜单 */}
       {menuOpen && (
-        <div className="border-t border-line bg-white md:hidden">
+        <div className="border-t border-line bg-surface md:hidden">
           <nav className="flex flex-col px-2 py-2">
             <Link
               href="/"
               onClick={close}
-              className="rounded-lg px-3 py-2.5 text-sm text-ink transition-colors hover:bg-gray-50"
+              className="rounded-lg px-3 py-2.5 text-sm text-ink transition-colors hover:bg-white/[0.04]"
             >
               Home
             </Link>
             <Link
               href="/console"
               onClick={close}
-              className="rounded-lg px-3 py-2.5 text-sm text-ink transition-colors hover:bg-gray-50"
+              className="rounded-lg px-3 py-2.5 text-sm text-ink transition-colors hover:bg-white/[0.04]"
             >
               Dashboard
             </Link>
             <Link
               href="#"
               onClick={close}
-              className="rounded-lg px-3 py-2.5 text-sm text-muted transition-colors hover:bg-gray-50"
+              className="rounded-lg px-3 py-2.5 text-sm text-muted transition-colors hover:bg-white/[0.04]"
             >
               Docs
             </Link>
             <Link
               href="#"
               onClick={close}
-              className="rounded-lg px-3 py-2.5 text-sm text-muted transition-colors hover:bg-gray-50"
+              className="rounded-lg px-3 py-2.5 text-sm text-muted transition-colors hover:bg-white/[0.04]"
             >
               Pricing
             </Link>

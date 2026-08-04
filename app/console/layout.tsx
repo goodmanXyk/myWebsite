@@ -25,7 +25,7 @@ export default function ConsoleLayout({
 
   if (loading || !user) {
     return (
-      <div className="flex h-screen items-center justify-center bg-white text-muted">
+      <div className="flex h-screen items-center justify-center bg-surface text-muted">
         加载中…
       </div>
     );
@@ -33,7 +33,7 @@ export default function ConsoleLayout({
 
   return (
     <ToastProvider>
-      <div className="flex h-screen overflow-hidden bg-white">
+      <div className="flex h-screen overflow-hidden bg-surface">
         {/* 桌面端：固定侧栏 */}
         <div className="hidden h-full md:block">
           <Sidebar user={user} />
@@ -43,10 +43,10 @@ export default function ConsoleLayout({
         {navOpen && (
           <div className="fixed inset-0 z-50 md:hidden">
             <div
-              className="absolute inset-0 bg-black/40"
+              className="absolute inset-0 bg-black/70"
               onClick={() => setNavOpen(false)}
             />
-            <div className="animate-slide-in-left absolute left-0 top-0 h-full w-60 bg-white shadow-xl">
+            <div className="animate-slide-in-left absolute left-0 top-0 h-full w-60 bg-surface shadow-xl">
               <Sidebar user={user} onNavigate={() => setNavOpen(false)} />
             </div>
           </div>

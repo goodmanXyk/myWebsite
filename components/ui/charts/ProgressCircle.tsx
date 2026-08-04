@@ -22,7 +22,7 @@ export function ProgressCircle({
           cx={size / 2}
           cy={size / 2}
           r={r}
-          stroke="#e5e5e5"
+          stroke="#262626"
           strokeWidth={stroke}
           fill="none"
         />

@@ -27,13 +27,13 @@ export function Input({
       )}
       <input
         id={inputId}
-        className={`w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm text-ink outline-none transition-colors duration-150 placeholder:text-muted/70 hover:border-muted focus:border-brand focus:ring-2 focus:ring-brand/20 [color-scheme:light] ${
+        className={`w-full rounded-xl border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-colors duration-150 placeholder:text-muted/70 hover:border-muted focus:border-brand focus:ring-2 focus:ring-brand/20 [color-scheme:light] ${
           hasError ? "border-red-400" : "border-line"
         } ${className}`}
         {...props}
       />
       {error ? (
-        <span className="text-xs text-red-600">{error}</span>
+        <span className="text-xs text-red-400">{error}</span>
       ) : hint ? (
         <span className="text-xs text-muted">{hint}</span>
       ) : null}

@@ -32,7 +32,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-150 ${
         visible ? "opacity-100" : "opacity-0"
-      } bg-black/30 backdrop-blur-sm`}
+      } bg-black/70 backdrop-blur-sm`}
       onClick={onClose}
     >
       <Card

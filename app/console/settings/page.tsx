@@ -159,7 +159,7 @@ export default function SettingsPage() {
         <p className="text-xs text-muted">
           ℹ️ 当前为前端 Mock 阶段：Webhook 地址仅做配置与「模拟推送」（在浏览器控制台打印将要发送的
           JSON 负载）。真实 HTTP 推送需在后续接入后端 / Next API Route，届时只需在
-          <code className="mx-1 rounded bg-gray-100 px-1">simulatePush</code>
+          <code className="mx-1 rounded bg-white/10 px-1">simulatePush</code>
           处替换为实际请求即可。
         </p>
       </Card>

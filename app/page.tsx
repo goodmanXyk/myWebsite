@@ -17,7 +17,7 @@ export default function Home() {
   }, [loading, user, router]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-canvas">
       <SiteNavbar />
       <main className="mx-auto max-w-6xl px-4 py-24 text-center">
         <p className="text-sm font-medium tracking-wide text-brand">

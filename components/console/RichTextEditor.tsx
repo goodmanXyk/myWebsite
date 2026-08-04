@@ -61,8 +61,8 @@ function ToolbarButton({
       aria-label={title}
       onMouseDown={(e) => e.preventDefault()} // 避免抢焦点导致选区丢失
       onClick={onClick}
-      className={`flex h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-gray-100 hover:text-ink ${
-        active ? "bg-gray-100 text-ink" : ""
+      className={`flex h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-white/10 hover:text-ink ${
+        active ? "bg-white/10 text-ink" : ""
       }`}
     >
       {children}
@@ -88,7 +88,7 @@ function FontSizeSelect({ editor }: { editor: Editor }) {
         if (v === "p") editor.chain().focus().setParagraph().run();
         else editor.chain().focus().toggleHeading({ level: Number(v[1]) as 1 | 2 | 3 | 4 }).run();
       }}
-      className="h-7 rounded-md border border-line bg-white px-1.5 text-xs text-muted outline-none hover:text-ink focus:border-ink"
+      className="h-7 rounded-md border border-line bg-surface px-1.5 text-xs text-muted outline-none hover:text-ink focus:border-ink"
     >
       <option value="p">正文</option>
       <option value="h1">标题 1</option>

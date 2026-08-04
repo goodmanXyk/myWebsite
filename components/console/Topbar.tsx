@@ -32,13 +32,13 @@ export function Topbar({
   const title = titleMap[pathname] ?? "Dashboard";
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-line bg-white px-4 md:px-6">
+    <header className="flex h-14 items-center justify-between border-b border-line bg-surface px-4 md:px-6">
       <div className="flex items-center gap-2">
         {onMenuClick && (
           <button
             type="button"
             onClick={onMenuClick}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-ink transition-colors hover:bg-gray-100 md:hidden"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-ink transition-colors hover:bg-white/10 md:hidden"
             aria-label="打开菜单"
           >
             <span className="text-lg leading-none">☰</span>
@@ -54,20 +54,20 @@ export function Topbar({
         <NotificationBell />
         <button
           onClick={() => setOpen((v) => !v)}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-ink text-xs font-semibold text-white"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-xs font-semibold text-black"
           aria-label="用户菜单"
         >
           {initials(user)}
         </button>
         {open && (
-          <div className="absolute right-0 top-10 z-50 w-44 overflow-hidden rounded-lg border border-line bg-white py-1 shadow-lg">
+          <div className="absolute right-0 top-10 z-50 w-44 overflow-hidden rounded-lg border border-line bg-surface py-1 shadow-lg">
             <div className="border-b border-line px-3 py-2">
               <p className="truncate text-sm font-medium text-ink">{user.name}</p>
               <p className="truncate text-xs text-muted">{user.email}</p>
             </div>
             <button
               onClick={logout}
-              className="block w-full px-3 py-2 text-left text-sm text-ink transition-colors hover:bg-gray-50"
+              className="block w-full px-3 py-2 text-left text-sm text-ink transition-colors hover:bg-white/[0.04]"
             >
               退出登录 / Log out
             </button>

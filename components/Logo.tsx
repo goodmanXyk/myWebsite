@@ -10,7 +10,7 @@ export function Logo({
 }) {
   return (
     <Link href={href} className="flex items-center gap-2">
-      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-ink text-white">
+      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-black">
         <svg
           width="16"
           height="16"

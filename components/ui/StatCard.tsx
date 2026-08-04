@@ -17,7 +17,7 @@ export function StatCard({
 }: StatCardProps) {
   return (
       <div
-        className={`rounded-card border border-line bg-white p-5 transition-shadow duration-150 hover:shadow-soft ${
+        className={`rounded-card border border-line bg-surface p-5 transition-shadow duration-150 hover:shadow-soft ${
           accent ? "border-l-4 border-l-brand" : ""
         }`}
       >

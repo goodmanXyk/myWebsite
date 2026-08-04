@@ -8,15 +8,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#0d0d0d",
-        muted: "#6b6b6b",
-        line: "#e5e5e5",
+        ink: "#f5f5f5",
+        muted: "#a1a1a1",
+        line: "#262626",
         brand: "#10a37f",
         "brand-dark": "#0e8e6e",
-        canvas: "#fafafa",
+        canvas: "#000000",
+        surface: "#111111",
+        "surface-2": "#1a1a1a",
       },
       borderRadius: {
-        card: "12px",
+        card: "16px",
+        pill: "9999px",
       },
       keyframes: {
         "fade-in": {
@@ -43,7 +46,9 @@ const config: Config = {
         "slide-up": "slide-up .2s ease-out",
       },
       boxShadow: {
-        soft: "0 1px 2px rgba(13,13,13,.04), 0 4px 16px rgba(13,13,13,.06)",
+        soft: "0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.4)",
+        glow: "0 0 0 1px rgba(255,255,255,.06), 0 8px 30px rgba(0,0,0,.5)",
+        "brand-glow": "0 8px 30px rgba(16,163,127,.25)",
       },
       fontFamily: {
         sans: [
