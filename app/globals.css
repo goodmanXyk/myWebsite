@@ -11,9 +11,9 @@
   --brand: #f5f5f5;
   --surface: #161616;
   --surface-2: #1c1c1c;
-  /* Geist（Vercel 官方字体）为主，中文回退到系统黑体 */
-  --font-sans: var(--font-geist-sans), "Inter", "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+  /* Geist 负责英文/数字，Noto Sans SC（思源黑体）负责中文，观感对齐 OpenAI Sans SC */
+  --font-sans: var(--font-geist-sans), var(--font-noto-sc), "Inter", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Consolas,
     monospace;
 }
@@ -29,14 +29,17 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   font-size: 15px;
-  line-height: 1.6;
+  line-height: 1.7;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  font-synthesis: none;
 }
 
-/* 中文无需负字距；标题加粗保持清晰层级 */
+/* 标题层级 */
 h1, h2, h3, h4 {
   font-weight: 600;
+  line-height: 1.3;
 }
 
 * {
