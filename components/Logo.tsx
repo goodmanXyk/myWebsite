@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { SITE } from "@/lib/theme";
 
 export function Logo({
@@ -22,7 +22,7 @@ export function Logo({
         </svg>
       </span>
       {showText && (
-        <span className="text-base font-semibold tracking-tight text-ink">
+        <span className="text-[15px] font-medium tracking-normal text-ink">
           {SITE.name}
         </span>
       )}

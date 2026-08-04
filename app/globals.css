@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -29,7 +29,7 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   font-size: 15px;
-  line-height: 1.7;
+  line-height: 1.75;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -38,8 +38,8 @@ body {
 
 /* 标题层级 */
 h1, h2, h3, h4 {
-  font-weight: 600;
-  line-height: 1.3;
+  font-weight: 500;
+  line-height: 1.35;
 }
 
 * {
