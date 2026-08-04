@@ -2,6 +2,9 @@
   "name": "ai-workflow-platform",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -27,7 +30,7 @@
     "mammoth": "^1.12.0",
     "mysql2": "^3.23.2",
     "next": "^14.2.35",
-    "pdf-parse": "^2.4.5",
+    "pdf-parse": "^1.1.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-markdown": "^10.1.0",
@@ -39,6 +42,7 @@
   },
   "devDependencies": {
     "@types/node": "20.14.10",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "@types/turndown": "^5.0.6",

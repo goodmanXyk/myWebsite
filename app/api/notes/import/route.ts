@@ -6,7 +6,8 @@ import { requireUser } from "@/lib/server/auth";
 import mammoth from "mammoth";
 import TurndownService from "turndown";
 import * as XLSX from "xlsx";
-import { PDFParse } from "pdf-parse";
+import pdfParse from "pdf-parse/lib/pdf-parse.js";
+
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8MB
 const SUPPORTED = "md / txt / docx / xls / xlsx / csv / pdf";
@@ -105,9 +106,7 @@ export async function POST(req: Request) {
         break;
       }
       case "pdf": {
-        const parser = new PDFParse({ data: buffer });
-        const result = await parser.getText();
-        await parser.destroy().catch(() => undefined);
+        const result = await pdfParse(buffer);
         content = result.text.trim();
         break;
       }
