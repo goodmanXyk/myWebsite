@@ -67,3 +67,33 @@ export function toggleTodo(userId: string, id: string) {
     completedAt: completed ? null : Date.now(),
   });
 }
+
+// ===== 完成评价：根据确认完成时间与截止时间自动判断 =====
+export type TodoEvaluationTone = "positive" | "neutral" | "danger";
+
+export interface TodoEvaluation {
+  kind: "early" | "kadian" | "redeemed" | "overdue";
+  label: string;
+  emoji: string;
+  tone: TodoEvaluationTone;
+}
+
+/** 卡点阈值：截止前 1 小时内完成视为「卡点完成」 */
+export const KADIAN_MS = 60 * 60 * 1000;
+
+export function evaluateTodo(todo: Todo, now: number = Date.now()): TodoEvaluation | null {
+  if (!todo.due) return null; // 无截止时间不评价
+  if (todo.status === "pending") {
+    return todo.due < now
+      ? { kind: "overdue", label: "逾期未完成", emoji: "😔", tone: "danger" }
+      : null;
+  }
+  if (todo.completedAt == null) return null; // 历史数据无完成时间，不评价
+  if (todo.completedAt <= todo.due - KADIAN_MS) {
+    return { kind: "early", label: "提前完成", emoji: "😊", tone: "positive" };
+  }
+  if (todo.completedAt <= todo.due) {
+    return { kind: "kadian", label: "卡点完成", emoji: "😢", tone: "neutral" };
+  }
+  return { kind: "redeemed", label: "补救成功", emoji: "😊", tone: "positive" };
+}

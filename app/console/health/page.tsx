@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { subDays, addDays, format } from "date-fns";
+import { subDays, addDays, startOfWeek, format } from "date-fns";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { getStore } from "@/lib/store";
@@ -87,6 +87,16 @@ function shortDateLabel(key: string): string {
   return format(new Date(key + "T00:00:00"), "M月d日 (EEE)");
 }
 
+// 本周（周一 ~ 周日）的 7 个日期，用于一周规划与周总结
+function currentWeekDays(): string[] {
+  const out: string[] = [];
+  const monday = startOfWeek(new Date(), { weekStartsOn: 1 });
+  for (let i = 0; i < 7; i++) {
+    out.push(todayKey(addDays(monday, i)));
+  }
+  return out;
+}
+
 export default function HealthPage() {
   const { user } = useAuth();
   const { show } = useToast();
@@ -139,6 +149,7 @@ export default function HealthPage() {
   if (!user) return null;
   const uid = user.id;
   const days7 = useMemo(() => lastNDays(7), []);
+  const weekDays = useMemo(() => currentWeekDays(), []);
   const isToday = selectedDate === todayKey();
   const dayLabel = (s: string) => (isToday ? `今日${s}` : `${shortDateLabel(selectedDate)} ${s}`);
 
@@ -299,11 +310,11 @@ export default function HealthPage() {
     }
   };
 
-  // 未来 7 天规划（含今天）
+  // 本周规划（周一 ~ 周日）
   const future7 = useMemo(() => {
     const arr: { key: string; workouts: typeof dayWorkout; diet: typeof dayDiet }[] = [];
     for (let i = 0; i < 7; i++) {
-      const key = todayKey(addDays(new Date(), i));
+      const key = weekDays[i];
       arr.push({
         key,
         workouts: workoutList.filter((w) => !w.done && w.date === key),
@@ -312,16 +323,16 @@ export default function HealthPage() {
     }
     return arr;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workoutList, dietList]);
+  }, [workoutList, dietList, weekDays]);
 
   const hasFuturePlan = future7.some((d) => d.workouts.length > 0 || d.diet.length > 0);
 
-  // ===== 周总结（过去 7 天）=====
+  // ===== 周总结（本周 周一~周日）=====
   const weekly = useMemo(() => {
-    const inWeek = (date: string) => days7.includes(date);
+    const inWeek = (date: string) => weekDays.includes(date);
     const waterInWeek = waterDays.filter((d) => inWeek(d.date));
     const totalWater = waterInWeek.reduce((s, d) => s + d.amountMl, 0);
-    const waterAvg = days7.length ? Math.round(totalWater / days7.length) : 0;
+    const waterAvg = weekDays.length ? Math.round(totalWater / weekDays.length) : 0;
 
     const weightInWeek = weightList.filter((e) => inWeek(e.date));
     const wFirst = weightInWeek[0];
@@ -356,31 +367,31 @@ export default function HealthPage() {
     const totalWorkoutMin = workoutInWeek.reduce((s, e) => s + e.durationMin, 0);
     const trainedDays = new Set(workoutInWeek.map((e) => e.date)).size;
 
-    const waterChart = days7.map((d) => ({
+    const waterChart = weekDays.map((d) => ({
       label: format(new Date(d + "T00:00:00"), "MM/dd"),
       value: waterDays.find((w) => w.date === d)?.amountMl ?? 0,
     }));
-    const weightChart = days7.map((d) => {
+    const weightChart = weekDays.map((d) => {
       const e = weightList.find((w) => w.date === d);
       return {
         label: format(new Date(d + "T00:00:00"), "MM/dd"),
         value: e ? e.kg : null,
       };
     });
-    const dietChart = days7.map((d) => ({
+    const dietChart = weekDays.map((d) => ({
       label: format(new Date(d + "T00:00:00"), "MM/dd"),
       value: dietList
         .filter((x) => x.date === d)
         .reduce((s, x) => s + (x.calories ?? 0), 0),
     }));
-    const sleepChart = days7.map((d) => {
+    const sleepChart = weekDays.map((d) => {
       const e = sleepList.find((s) => s.date === d);
       return {
         label: format(new Date(d + "T00:00:00"), "MM/dd"),
         value: e ? +(e.durationMin / 60).toFixed(1) : 0,
       };
     });
-    const workoutChart = days7.map((d) => ({
+    const workoutChart = weekDays.map((d) => ({
       label: format(new Date(d + "T00:00:00"), "MM/dd"),
       value: workoutList
         .filter((w) => w.date === d && w.done)
@@ -439,7 +450,7 @@ export default function HealthPage() {
       totalWorkoutMin,
       trainedDays,
       sleepCount: sleepInWeek.length,
-      days: days7.length,
+      days: weekDays.length,
       waterChart,
       weightChart,
       dietChart,
@@ -448,7 +459,7 @@ export default function HealthPage() {
       report,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [waterDays, weightList, dietList, sleepList, workoutList, days7, waterSettings]);
+  }, [waterDays, weightList, dietList, sleepList, workoutList, weekDays, waterSettings]);
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -723,12 +734,12 @@ export default function HealthPage() {
 
           {tab === "workout" && (
             <div className="flex flex-col gap-6">
-              {/* 未来 7 天规划总览 */}
+              {/* 本周规划 · 周一至周日总览 */}
               <Card className="border-l-4 border-l-brand">
-                <p className="mb-3 text-sm font-medium text-ink">未来 7 天规划</p>
+                <p className="mb-3 text-sm font-medium text-ink">本周规划 · 周一至周日</p>
                 {!hasFuturePlan ? (
                   <p className="text-xs text-muted">
-                    未来 7 天暂无计划，左侧添加健身 / 饮食即可前瞻安排 🗓️
+                    本周暂无计划，左侧添加健身 / 饮食即可安排 🗓️
                   </p>
                 ) : (
                   <ul className="flex flex-col divide-y divide-line">
@@ -946,8 +957,7 @@ export default function HealthPage() {
           {tab === "weekly" && (
             <div className="flex flex-col gap-6">
               <p className="text-sm text-muted">
-                {shortDateLabel(days7[0])} – {shortDateLabel(days7[days7.length - 1])} · 过去{" "}
-                {weekly.days} 天概览
+                {shortDateLabel(weekDays[0])} – {shortDateLabel(weekDays[6])} · 本周概览
               </p>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
                 <Card className="p-4">

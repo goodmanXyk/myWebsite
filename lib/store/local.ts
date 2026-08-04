@@ -1,4 +1,4 @@
-﻿// LocalStore：本地 localStorage 实现（API_MODE !== "remote" 时使用）。
+// LocalStore：本地 localStorage 实现（API_MODE !== "remote" 时使用）。
 // 所有方法已按接口改造为异步（Promise），行为与原先完全一致。
 // 鉴权用户存储逻辑从 lib/auth.tsx 迁移至此。
 
@@ -231,6 +231,19 @@ const notesStore: NotesStore = {
   },
   async removeNote(userId, id) {
     notes.deleteNote(userId, id);
+  },
+  async importNote(userId, { file, notebookId }) {
+    const name = file.name || "导入文档";
+    const ext = (name.split(".").pop() || "").toLowerCase();
+    if (!["md", "markdown", "txt"].includes(ext)) {
+      throw new Error("本地演示模式仅支持 md / txt 导入，Word / Excel / PDF 请使用线上版本");
+    }
+    const content = await file.text();
+    return notes.addNote(userId, {
+      title: name.replace(/\.[^.]+$/, "") || "导入文档",
+      content,
+      notebookId: notebookId ?? null,
+    });
   },
 };
 

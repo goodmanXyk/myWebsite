@@ -1,4 +1,4 @@
-﻿// 统一数据访问层类型定义。
+// 统一数据访问层类型定义。
 // local 实现：LocalStore（localStorage）；remote 实现：RemoteStore（调用 Next.js API + MySQL）。
 // 所有数据方法均为异步，页面通过 await 获取数据。
 
@@ -134,6 +134,10 @@ export interface NotesStore {
     patch: Partial<Pick<Note, "title" | "content" | "notebookId">>
   ): Promise<void>;
   removeNote(userId: string, id: string): Promise<void>;
+  importNote(
+    userId: string,
+    data: { file: File; notebookId?: string | null }
+  ): Promise<Note>;
 }
 
 export interface Store {

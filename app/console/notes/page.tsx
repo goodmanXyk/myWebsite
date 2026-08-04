@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { getStore } from "@/lib/store";
@@ -67,6 +67,10 @@ export default function NotesPage() {
 
   // 右键菜单
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; notebook: Notebook } | null>(null);
+
+  // 本地文件导入
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 新建/重命名知识库
   const [nbModalOpen, setNbModalOpen] = useState(false);
@@ -162,6 +166,26 @@ export default function NotesPage() {
       show(e instanceof Error ? e.message : "保存失败", "warning");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleImport = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!user) return;
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setImporting(true);
+    try {
+      const nbId = filter === "none" ? null : filter === "all" ? null : filter;
+      const n = await store.notes.importNote(user.id, { file, notebookId: nbId });
+      show(`已导入「${n.title}」📥`, "success");
+      await loadNotes(filter);
+      await loadNotebooks();
+      await openNote(n.id);
+    } catch (err) {
+      show(err instanceof Error ? err.message : "导入失败", "warning");
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -343,9 +367,23 @@ export default function NotesPage() {
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-ink">{filterLabel}</p>
           <div className="flex items-center gap-1">
+            <Button
+              variant="secondary"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={importing}
+            >
+              {importing ? "导入中…" : "导入"}
+            </Button>
             <Button variant="secondary" onClick={createNote}>
               + 新建文档
             </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".md,.markdown,.txt,.doc,.docx,.xls,.xlsx,.csv,.pdf"
+              className="hidden"
+              onChange={handleImport}
+            />
             <button
               onClick={() => toggleCollapse("middle")}
               title="收起文档列表"

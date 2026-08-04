@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/lib/auth";
 import { getStore } from "@/lib/store";
 import type { Todo, TodoPriority, TodoStatus } from "@/lib/store";
+import { evaluateTodo } from "@/lib/todos";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -58,6 +59,12 @@ function fromLocalInput(v: string): number | null {
   if (!v) return null;
   const t = new Date(v).getTime();
   return isNaN(t) ? null : t;
+}
+
+function fmtTime(ts: number): string {
+  const d = new Date(ts);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getMonth() + 1}月${d.getDate()}日 ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
 function formatDue(ts: number | null): { text: string; overdue: boolean } {
@@ -329,6 +336,26 @@ export default function TodosPage() {
                   <p className={`mt-1 text-xs ${due.overdue && !done ? "text-red-500" : "text-muted"}`}>
                     📅 截止：{due.text}
                   </p>
+                  {done && t.completedAt ? (
+                    <p className="mt-1 text-xs text-muted">✅ 完成于 {fmtTime(t.completedAt)}</p>
+                  ) : null}
+                  {(() => {
+                    const ev = evaluateTodo(t);
+                    if (!ev) return null;
+                    const toneCls =
+                      ev.tone === "danger"
+                        ? "bg-red-500/10 text-red-300 border-red-500/25"
+                        : ev.tone === "neutral"
+                          ? "bg-amber-500/10 text-amber-300 border-amber-500/25"
+                          : "bg-white/5 text-ink border-line";
+                    return (
+                      <span
+                        className={`mt-1 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${toneCls}`}
+                      >
+                        {ev.emoji} {ev.label}
+                      </span>
+                    );
+                  })()}
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
                   <button

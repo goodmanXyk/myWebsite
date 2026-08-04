@@ -64,9 +64,9 @@ async function api<T = unknown>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const headers: Record<string, string> = {};
+  const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
+  if (!isFormData) headers["Content-Type"] = "application/json";
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
 
@@ -348,6 +348,16 @@ const notesStore: NotesStore = {
   },
   async removeNote(_userId, id) {
     await api(`/api/notes/${id}`, { method: "DELETE" });
+  },
+  async importNote(_userId, { file, notebookId }) {
+    const form = new FormData();
+    form.append("file", file);
+    if (notebookId) form.append("notebookId", notebookId);
+    const data = await api<{ note: Note }>("/api/notes/import", {
+      method: "POST",
+      body: form,
+    });
+    return data.note;
   },
 };
 
