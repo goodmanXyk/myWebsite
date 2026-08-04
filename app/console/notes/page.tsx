@@ -314,13 +314,13 @@ export default function NotesPage() {
             <div className="hidden shrink-0 gap-1 group-hover:flex">
               <button
                 onClick={() => openNbModal(nb)}
-                className="rounded-md border border-white/10 px-1.5 py-0.5 text-xs text-muted transition-colors hover:bg-white/5 hover:text-white"
+                className="rounded-md px-1.5 py-0.5 text-xs text-muted transition-colors hover:bg-white/5 hover:text-white"
               >
                 改
               </button>
               <button
                 onClick={() => deleteNotebook(nb)}
-                className="rounded-md border border-red-500/15 px-1.5 py-0.5 text-xs text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
+                className="rounded-md px-1.5 py-0.5 text-xs text-muted transition-colors hover:bg-white/5 hover:text-red-300"
               >
                 删
               </button>
@@ -382,13 +382,13 @@ export default function NotesPage() {
                 <div className="hidden justify-end gap-2 group-hover:flex">
                   <button
                     onClick={() => openNote(n.id, true)}
-                    className="inline-flex items-center rounded-lg border border-white/10 px-2.5 py-1 text-xs text-muted transition-colors hover:border-white/20 hover:bg-white/5 hover:text-white"
+                    className="inline-flex items-center rounded-lg px-2.5 py-1 text-xs text-muted transition-colors hover:bg-white/5 hover:text-white"
                   >
                     编辑
                   </button>
                   <button
                     onClick={() => deleteNote(n)}
-                    className="inline-flex items-center rounded-lg border border-red-500/15 px-2.5 py-1 text-xs text-red-400 transition-colors hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
+                    className="inline-flex items-center rounded-lg px-2.5 py-1 text-xs text-muted transition-colors hover:bg-white/5 hover:text-red-300"
                   >
                     删除
                   </button>
@@ -488,7 +488,7 @@ export default function NotesPage() {
                 </Button>
                 <button
                   onClick={() => deleteNote(note)}
-                  className="inline-flex items-center rounded-lg border border-red-500/15 px-3 py-1 text-xs text-red-400 transition-colors hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
+                  className="inline-flex items-center rounded-lg px-3 py-1 text-xs text-muted transition-colors hover:bg-white/5 hover:text-red-300"
                 >
                   删除
                 </button>
