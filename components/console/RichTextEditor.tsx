@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Table from "@tiptap/extension-table";
@@ -109,7 +109,7 @@ export function RichTextEditor({ value, onChange, placeholder }: Props) {
       TaskItem.configure({ nested: true }),
       Placeholder.configure({ placeholder }),
       Link.configure({ openOnClick: false, autolink: true, defaultProtocol: "https" }),
-      Image,
+      Image.configure({ allowBase64: true }),
       Markdown,
     ],
     content: "",
@@ -128,6 +128,9 @@ export function RichTextEditor({ value, onChange, placeholder }: Props) {
     editor.commands.setContent(value || "", false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor]);
+
+  // 本地图片上传：客户端压缩后转 base64 嵌入
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!editor) return null;
 
@@ -151,15 +154,54 @@ export function RichTextEditor({ value, onChange, placeholder }: Props) {
     }
   };
 
-  const setImage = () => {
-    const url = window.prompt("图片地址", "https://");
-    if (url && url.trim()) {
-      editor.chain().focus().setImage({ src: url.trim() }).run();
-    }
+  const compressImage = (dataUrl: string, cb: (out: string) => void, maxDim = 1600, quality = 0.85) => {
+    const img = new window.Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const ratio = Math.min(maxDim / width, maxDim / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return cb(dataUrl);
+      ctx.drawImage(img, 0, 0, width, height);
+      const isPng = dataUrl.startsWith("data:image/png");
+      cb(canvas.toDataURL(isPng ? "image/png" : "image/jpeg", isPng ? undefined : quality));
+    };
+    img.onerror = () => cb(dataUrl);
+    img.src = dataUrl;
+  };
+
+  const handleImageFile = (file: File | null) => {
+    if (!file || !editor) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      compressImage(dataUrl, (out) => {
+        editor.chain().focus().setImage({ src: out }).run();
+      });
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
     <div className="flex flex-col">
+      {/* 隐藏的文件选择框（本地图片） */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          handleImageFile(e.target.files?.[0] ?? null);
+          e.target.value = "";
+        }}
+      />
+
       {/* 工具栏 */}
       <div className="flex flex-wrap items-center gap-0.5 border-b border-line px-2 py-1.5">
         <ToolbarButton title="撤销" onClick={() => editor.chain().focus().undo().run()} active={editor.can().undo()}>{Icons.undo}</ToolbarButton>
@@ -188,8 +230,36 @@ export function RichTextEditor({ value, onChange, placeholder }: Props) {
           {Icons.table}
         </ToolbarButton>
         <ToolbarButton title="插入链接" onClick={setLink} active={editor.isActive("link")}>{Icons.link}</ToolbarButton>
-        <ToolbarButton title="插入图片" onClick={setImage}>{Icons.image}</ToolbarButton>
+        <ToolbarButton title="插入本地图片" onClick={() => fileInputRef.current?.click()}>{Icons.image}</ToolbarButton>
         <ToolbarButton title="分割线" onClick={() => editor.chain().focus().setHorizontalRule().run()}>{Icons.hr}</ToolbarButton>
+
+        {/* 表格操作（光标在表格内时显示） */}
+        {editor.isActive("table") && (
+          <>
+            <span className="mx-1 h-4 w-px bg-line" />
+            <ToolbarButton title="上方插入行" onClick={() => editor.chain().focus().addRowBefore().run()}>
+              <span className="text-xs">↑行</span>
+            </ToolbarButton>
+            <ToolbarButton title="下方插入行" onClick={() => editor.chain().focus().addRowAfter().run()}>
+              <span className="text-xs">↓行</span>
+            </ToolbarButton>
+            <ToolbarButton title="删除当前行" onClick={() => editor.chain().focus().deleteRow().run()}>
+              <span className="text-xs text-red-500">−行</span>
+            </ToolbarButton>
+            <ToolbarButton title="左侧插入列" onClick={() => editor.chain().focus().addColumnBefore().run()}>
+              <span className="text-xs">←列</span>
+            </ToolbarButton>
+            <ToolbarButton title="右侧插入列" onClick={() => editor.chain().focus().addColumnAfter().run()}>
+              <span className="text-xs">→列</span>
+            </ToolbarButton>
+            <ToolbarButton title="删除当前列" onClick={() => editor.chain().focus().deleteColumn().run()}>
+              <span className="text-xs text-red-500">−列</span>
+            </ToolbarButton>
+            <ToolbarButton title="删除整个表格" onClick={() => editor.chain().focus().deleteTable().run()}>
+              <span className="text-xs text-red-500">✕表</span>
+            </ToolbarButton>
+          </>
+        )}
       </div>
 
       {/* 编辑器 */}

@@ -14,7 +14,6 @@ import { RichTextEditor } from "@/components/console/RichTextEditor";
 const store = getStore();
 
 type Filter = "all" | "none" | string; // string = notebookId
-type Mode = "edit" | "preview" | "split";
 
 function fmtTime(ts: number): string {
   const d = new Date(ts);
@@ -31,13 +30,13 @@ export default function NotesPage() {
   const [filter, setFilter] = useState<Filter>("all");
   const [loaded, setLoaded] = useState(false);
 
-  // 当前编辑的文档
+  // 当前打开的文档
   const [note, setNote] = useState<Note | null>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [editing, setEditing] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [mode, setMode] = useState<Mode>("edit");
 
   // 新建/重命名知识库
   const [nbModalOpen, setNbModalOpen] = useState(false);
@@ -81,10 +80,11 @@ export default function NotesPage() {
     setTitle("");
     setContent("");
     setDirty(false);
+    setEditing(false);
     loadNotes(f);
   };
 
-  const openNote = async (id: string) => {
+  const openNote = async (id: string, edit = false) => {
     if (!user) return;
     try {
       const n = await store.notes.getNote(user.id, id);
@@ -93,7 +93,7 @@ export default function NotesPage() {
       setTitle(n.title);
       setContent(n.content);
       setDirty(false);
-      setMode("edit");
+      setEditing(edit);
     } catch (e) {
       show(e instanceof Error ? e.message : "加载文档失败", "warning");
     }
@@ -101,7 +101,7 @@ export default function NotesPage() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s" && note) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s" && note && editing) {
         e.preventDefault();
         saveNote();
       }
@@ -109,7 +109,7 @@ export default function NotesPage() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [note, dirty, title]);
+  }, [note, editing, dirty, title]);
 
   const saveNote = async () => {
     if (!user || !note) return;
@@ -141,13 +141,13 @@ export default function NotesPage() {
     try {
       const n = await store.notes.addNote(user.id, {
         title: "未命名文档",
-        content: "# 新文档\n\n开始记录…",
+        content: "",
         notebookId: nbId,
       });
       show("已新建文档 📝", "success");
       loadNotes(filter);
       loadNotebooks();
-      openNote(n.id);
+      openNote(n.id, true);
     } catch (e) {
       show(e instanceof Error ? e.message : "新建失败", "warning");
     }
@@ -163,6 +163,7 @@ export default function NotesPage() {
         setTitle("");
         setContent("");
         setDirty(false);
+        setEditing(false);
       }
       show("已删除 🗑️", "success");
       loadNotes(filter);
@@ -237,9 +238,9 @@ export default function NotesPage() {
   if (!user) return null;
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-4 lg:flex-row">
+    <div className="mx-auto flex w-full flex-col gap-4 lg:flex-row">
       {/* 左栏：知识库列表 */}
-      <div className="flex w-full flex-col gap-2 lg:w-52 lg:shrink-0">
+      <div className="flex w-full flex-col gap-2 lg:w-48 lg:shrink-0">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-semibold text-ink">知识库</h1>
           <Button variant="secondary" onClick={() => openNbModal(null)}>
@@ -288,7 +289,7 @@ export default function NotesPage() {
       </div>
 
       {/* 中栏：文档列表 */}
-      <div className="flex w-full flex-col gap-2 lg:w-64 lg:shrink-0">
+      <div className="flex w-full flex-col gap-2 lg:w-60 lg:shrink-0">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-ink">{filterLabel}</p>
           <Button variant="secondary" onClick={createNote}>
@@ -315,6 +316,9 @@ export default function NotesPage() {
                   <span className="text-xs text-muted">更新于 {fmtTime(n.updatedAt)}</span>
                 </button>
                 <div className="hidden justify-end gap-2 group-hover:flex">
+                  <button className="text-xs text-muted hover:text-ink" onClick={() => openNote(n.id, true)}>
+                    编辑
+                  </button>
                   <button className="text-xs text-red-500 hover:underline" onClick={() => deleteNote(n)}>
                     删除
                   </button>
@@ -325,28 +329,19 @@ export default function NotesPage() {
         )}
       </div>
 
-      {/* 右栏：编辑器 / 预览 */}
+      {/* 右栏：预览 / 编辑 */}
       <div className="min-w-0 flex-1">
         {!note ? (
           <Card className="flex h-64 items-center justify-center text-sm text-muted">
-            从左侧选择或新建一篇文档开始编辑 📝
+            从左侧选择一篇文档查看，或新建一篇开始记录 📝
           </Card>
-        ) : (
-          <Card className="flex flex-col gap-3 p-0">
-            {/* 工具栏 */}
+        ) : editing ? (
+          /* ---------- 编辑模式 ---------- */
+          <Card className="flex flex-col p-0">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-2.5">
-              <div className="flex items-center gap-1 rounded-lg bg-gray-100 p-0.5">
-                {(["edit", "split", "preview"] as Mode[]).map((m) => (
-                  <button
-                    key={m}
-                    onClick={() => setMode(m)}
-                    className={`rounded-md px-2.5 py-1 text-xs transition-colors ${
-                      mode === m ? "bg-white font-medium text-ink shadow-sm" : "text-muted hover:text-ink"
-                    }`}
-                  >
-                    {m === "edit" ? "编辑" : m === "split" ? "分屏" : "预览"}
-                  </button>
-                ))}
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-ink">编辑文档</span>
+                {dirty && <span className="text-xs text-amber-500">未保存</span>}
               </div>
               <div className="flex items-center gap-2">
                 <select
@@ -361,18 +356,15 @@ export default function NotesPage() {
                     </option>
                   ))}
                 </select>
-                {dirty && <span className="text-xs text-amber-500">未保存</span>}
-                <Button
-                  onClick={saveNote}
-                  disabled={saving || !dirty}
-                  className="px-3 py-1 text-xs"
-                >
+                <Button variant="secondary" onClick={() => setEditing(false)} className="px-3 py-1 text-xs">
+                  返回预览
+                </Button>
+                <Button onClick={saveNote} disabled={saving || !dirty} className="px-3 py-1 text-xs">
                   {saving ? "保存中…" : "保存"}
                 </Button>
               </div>
             </div>
-
-            <div className="px-4 pt-2">
+            <div className="px-4 pt-3">
               <input
                 value={title}
                 onChange={(e) => {
@@ -383,28 +375,50 @@ export default function NotesPage() {
                 className="w-full bg-transparent text-xl font-semibold text-ink outline-none placeholder:text-muted/50"
               />
             </div>
-
-            <div className={`grid ${mode === "split" ? "grid-cols-2" : "grid-cols-1"}`}>
-              {mode !== "preview" && (
-                <RichTextEditor
-                  key={note.id}
-                  value={content}
-                  onChange={(md) => {
-                    setContent(md);
-                    setDirty(true);
-                  }}
-                  placeholder="开始书写，支持 Markdown…"
-                />
-              )}
-              {(mode === "split" || mode === "preview") && (
-                <div
-                  className={`${
-                    mode === "split" ? "max-h-[520px] overflow-y-auto border-l border-line" : "min-h-[420px]"
-                  } px-4 py-3`}
+            <RichTextEditor
+              key={note.id}
+              value={content}
+              onChange={(md) => {
+                setContent(md);
+                setDirty(true);
+              }}
+              placeholder="开始书写，支持 Markdown…"
+            />
+          </Card>
+        ) : (
+          /* ---------- 预览模式 ---------- */
+          <Card className="flex flex-col p-0">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-2.5">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-ink">{title || "未命名文档"}</span>
+                {dirty && <span className="text-xs text-amber-500">有未保存的修改</span>}
+              </div>
+              <div className="flex items-center gap-2">
+                <select
+                  value={note.notebookId ?? ""}
+                  onChange={(e) => moveNote(e.target.value)}
+                  className="rounded-lg border border-line bg-white px-2 py-1 text-xs text-muted outline-none focus:border-ink"
                 >
-                  <MarkdownView content={content} />
-                </div>
-              )}
+                  <option value="">未分类</option>
+                  {notebooks.map((nb) => (
+                    <option key={nb.id} value={nb.id}>
+                      {nb.name}
+                    </option>
+                  ))}
+                </select>
+                <Button onClick={() => setEditing(true)} className="px-3 py-1 text-xs">
+                  编辑
+                </Button>
+                <button
+                  onClick={() => deleteNote(note)}
+                  className="rounded-lg px-3 py-1 text-xs text-red-500 transition-colors hover:bg-red-50"
+                >
+                  删除
+                </button>
+              </div>
+            </div>
+            <div className="min-h-[420px] px-5 py-4">
+              <MarkdownView content={content} />
             </div>
           </Card>
         )}
