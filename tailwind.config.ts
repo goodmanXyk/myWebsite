@@ -8,14 +8,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#f5f5f5",
-        muted: "#a1a1a1",
-        line: "rgba(255, 255, 255, 0.08)",
-        brand: "#10a37f",
-        "brand-dark": "#0e8e6e",
-        canvas: "#0d0d0d",
+        ink: "#ffffff",
+        muted: "#8f8f8f",
+        line: "rgba(255, 255, 255, 0.06)",
+        brand: "#0285ff",
+        "brand-dark": "#003f7a",
+        canvas: "#131313",
         surface: "#161616",
-        "surface-2": "#1f1f1f",
+        "surface-2": "#1c1c1c",
       },
       borderRadius: {
         card: "16px",
@@ -48,7 +48,7 @@ const config: Config = {
       boxShadow: {
         soft: "0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.4)",
         glow: "0 0 0 1px rgba(255,255,255,.06), 0 8px 30px rgba(0,0,0,.5)",
-        "brand-glow": "0 8px 30px rgba(16,163,127,.25)",
+        "brand-glow": "0 8px 30px rgba(2,133,255,.20)",
       },
       fontFamily: {
         sans: [

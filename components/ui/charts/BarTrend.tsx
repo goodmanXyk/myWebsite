@@ -38,7 +38,7 @@ export function BarTrend({ data, label }: { data: DataPoint[]; label?: string })
           />
           <Bar
             dataKey="value"
-            fill="#10a37f"
+            fill="#0285ff"
             radius={[4, 4, 0, 0]}
             name={label}
           />

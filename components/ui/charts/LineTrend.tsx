@@ -46,10 +46,10 @@ export function LineTrend({
           <Line
             type="monotone"
             dataKey="value"
-            stroke="#10a37f"
+            stroke="#0285ff"
             strokeWidth={2}
-            dot={{ r: 3, fill: "#10a37f" }}
-            activeDot={{ r: 5, fill: "#10a37f" }}
+            dot={{ r: 3, fill: "#0285ff" }}
+            activeDot={{ r: 5, fill: "#0285ff" }}
             name={label}
             connectNulls={connectNulls}
           />

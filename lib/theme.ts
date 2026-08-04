@@ -1,13 +1,14 @@
 // 集中管理站点与主题相关的常量，便于后续微调成更贴近 OpenAI 的观感。
 
 export const COLORS = {
-  ink: "#f5f5f5",
-  muted: "#a1a1a1",
-  line: "#262626",
-  brand: "#10a37f",
-  brandDark: "#0e8e6e",
-  canvas: "#000000",
-  surface: "#111111",
+  ink: "#ffffff",
+  muted: "#8f8f8f",
+  line: "rgba(255, 255, 255, 0.06)",
+  brand: "#0285ff",
+  brandDark: "#003f7a",
+  canvas: "#131313",
+  surface: "#161616",
+  surface2: "#1c1c1c",
 } as const;
 
 export const SITE = {
