@@ -37,6 +37,31 @@ export default function NotesPage() {
   const [editing, setEditing] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [collapse, setCollapse] = useState<{ left: boolean; middle: boolean }>({
+    left: false,
+    middle: false,
+  });
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem("aiwf_notes_collapse");
+      if (raw) setCollapse(JSON.parse(raw));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const toggleCollapse = (key: "left" | "middle") => {
+    setCollapse((c) => {
+      const next = { ...c, [key]: !c[key] };
+      try {
+        window.localStorage.setItem("aiwf_notes_collapse", JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
 
   // 新建/重命名知识库
   const [nbModalOpen, setNbModalOpen] = useState(false);
@@ -239,13 +264,23 @@ export default function NotesPage() {
 
   return (
     <div className="mx-auto flex w-full flex-col gap-4 lg:flex-row">
-      {/* 左栏：知识库列表 */}
+      {/* 左栏：知识库列表（可折叠） */}
+      {!collapse.left && (
       <div className="flex w-full flex-col gap-2 lg:w-48 lg:shrink-0">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-semibold text-ink">知识库</h1>
-          <Button variant="secondary" onClick={() => openNbModal(null)}>
-            + 新建
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button variant="secondary" onClick={() => openNbModal(null)}>
+              + 新建
+            </Button>
+            <button
+              onClick={() => toggleCollapse("left")}
+              title="收起知识库面板"
+              className="hidden h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-gray-100 hover:text-ink lg:flex"
+            >
+              ‹
+            </button>
+          </div>
         </div>
         <button
           onClick={() => selectFilter("all")}
@@ -287,14 +322,36 @@ export default function NotesPage() {
         ))}
         {!loaded ? <p className="px-3 py-4 text-xs text-muted">加载中…</p> : null}
       </div>
+      )}
+      {collapse.left && (
+        <div className="hidden w-9 shrink-0 flex-col items-center border-r border-line py-3 lg:flex">
+          <button
+            onClick={() => toggleCollapse("left")}
+            title="展开知识库面板"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-gray-100 hover:text-ink"
+          >
+            »
+          </button>
+        </div>
+      )}
 
-      {/* 中栏：文档列表 */}
+      {/* 中栏：文档列表（可折叠） */}
+      {!collapse.middle && (
       <div className="flex w-full flex-col gap-2 lg:w-60 lg:shrink-0">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-ink">{filterLabel}</p>
-          <Button variant="secondary" onClick={createNote}>
-            + 新建文档
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button variant="secondary" onClick={createNote}>
+              + 新建文档
+            </Button>
+            <button
+              onClick={() => toggleCollapse("middle")}
+              title="收起文档列表"
+              className="hidden h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-gray-100 hover:text-ink lg:flex"
+            >
+              ‹
+            </button>
+          </div>
         </div>
         {!loaded ? (
           <p className="py-8 text-center text-xs text-muted">加载中…</p>
@@ -328,6 +385,18 @@ export default function NotesPage() {
           </div>
         )}
       </div>
+      )}
+      {collapse.middle && (
+        <div className="hidden w-9 shrink-0 flex-col items-center border-r border-line py-3 lg:flex">
+          <button
+            onClick={() => toggleCollapse("middle")}
+            title="展开文档列表"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-gray-100 hover:text-ink"
+          >
+            »
+          </button>
+        </div>
+      )}
 
       {/* 右栏：预览 / 编辑 */}
       <div className="min-w-0 flex-1">
