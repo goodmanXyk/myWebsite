@@ -6,6 +6,7 @@ import { readJSON, writeJSON, genId } from "@/lib/storage";
 import * as todos from "@/lib/todos";
 import * as health from "@/lib/health";
 import * as notify from "@/lib/notify";
+import * as notes from "@/lib/notes";
 import type {
   User,
   AuthResult,
@@ -13,6 +14,7 @@ import type {
   TodosStore,
   HealthStore,
   NotifyStore,
+  NotesStore,
   Store,
 } from "./types";
 
@@ -202,11 +204,42 @@ const notifyStore: NotifyStore = {
   },
 };
 
+const notesStore: NotesStore = {
+  async getNotebooks(userId) {
+    return notes.getNotebooks(userId);
+  },
+  async addNotebook(userId, name) {
+    return notes.addNotebook(userId, name);
+  },
+  async updateNotebook(userId, id, name) {
+    notes.updateNotebook(userId, id, name);
+  },
+  async removeNotebook(userId, id) {
+    notes.deleteNotebook(userId, id);
+  },
+  async getNotes(userId, notebookId) {
+    return notes.getNotes(userId, notebookId);
+  },
+  async getNote(userId, id) {
+    return notes.getNote(userId, id);
+  },
+  async addNote(userId, data) {
+    return notes.addNote(userId, data);
+  },
+  async updateNote(userId, id, patch) {
+    notes.updateNote(userId, id, patch);
+  },
+  async removeNote(userId, id) {
+    notes.deleteNote(userId, id);
+  },
+};
+
 export function createLocalStore(): Store {
   return {
     auth: authStore,
     todos: todosStore,
     health: healthStore,
     notify: notifyStore,
+    notes: notesStore,
   };
 }

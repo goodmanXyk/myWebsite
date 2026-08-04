@@ -9,6 +9,7 @@ import { NotificationBell } from "@/components/console/NotificationBell";
 const titleMap: Record<string, string> = {
   "/console": "Dashboard",
   "/console/todos": "我的待办",
+  "/console/notes": "知识库",
   "/console/health": "Body Healthy",
   "/console/settings": "设置",
 };

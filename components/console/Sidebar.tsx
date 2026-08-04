@@ -8,6 +8,7 @@ import type { User } from "@/lib/auth";
 const navItems = [
   { href: "/console", label: "Dashboard", icon: "▦" },
   { href: "/console/todos", label: "我的待办", icon: "✓" },
+  { href: "/console/notes", label: "知识库", icon: "📚" },
   { href: "/console/health", label: "Body Healthy", icon: "♥" },
   { href: "/console/workflows", label: "Workflows", icon: "⚡" },
   { href: "/console/projects", label: "Projects", icon: "◫" },

@@ -14,6 +14,7 @@ import type {
   HealthSettings,
 } from "@/lib/health";
 import type { WebhookKind, NotificationSettings, PushPayload } from "@/lib/notify";
+import type { Notebook, Note, NoteSummary } from "@/lib/notes";
 
 export interface User {
   id: string;
@@ -116,11 +117,31 @@ export interface NotifyStore {
   simulatePush(kind: WebhookKind, payload: PushPayload): void;
 }
 
+export interface NotesStore {
+  getNotebooks(userId: string): Promise<Notebook[]>;
+  addNotebook(userId: string, name: string): Promise<Notebook>;
+  updateNotebook(userId: string, id: string, name: string): Promise<void>;
+  removeNotebook(userId: string, id: string): Promise<void>;
+  getNotes(userId: string, notebookId?: string | null): Promise<NoteSummary[]>;
+  getNote(userId: string, id: string): Promise<Note | null>;
+  addNote(
+    userId: string,
+    data: { title: string; content?: string; notebookId?: string | null }
+  ): Promise<Note>;
+  updateNote(
+    userId: string,
+    id: string,
+    patch: Partial<Pick<Note, "title" | "content" | "notebookId">>
+  ): Promise<void>;
+  removeNote(userId: string, id: string): Promise<void>;
+}
+
 export interface Store {
   auth: AuthStore;
   todos: TodosStore;
   health: HealthStore;
   notify: NotifyStore;
+  notes: NotesStore;
 }
 
 // 重新导出领域类型，方便页面从 @/lib/store 统一引用。
@@ -139,4 +160,7 @@ export type {
   WebhookKind,
   NotificationSettings,
   PushPayload,
+  Notebook,
+  Note,
+  NoteSummary,
 };

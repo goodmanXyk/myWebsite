@@ -22,6 +22,10 @@ import type {
   NotificationSettings,
   WebhookKind,
   PushPayload,
+  Notebook,
+  Note,
+  NoteSummary,
+  NotesStore,
 } from "./types";
 
 const TOKEN_KEY = "aiwf_token";
@@ -299,6 +303,49 @@ function computeSleepDuration(bedtime: string, wakeTime: string): number {
   return wake - bed;
 }
 
+// ---------- Notes（个人知识库）----------
+const notesStore: NotesStore = {
+  async getNotebooks() {
+    const data = await api<{ notebooks: Notebook[] }>("/api/notebooks");
+    return data.notebooks;
+  },
+  async addNotebook(_userId, name) {
+    const data = await api<{ notebook: Notebook }>("/api/notebooks", {
+      method: "POST",
+      body: JSON.stringify({ name }),
+    });
+    return data.notebook;
+  },
+  async updateNotebook(_userId, id, name) {
+    await api(`/api/notebooks/${id}`, { method: "PATCH", body: JSON.stringify({ name }) });
+  },
+  async removeNotebook(_userId, id) {
+    await api(`/api/notebooks/${id}`, { method: "DELETE" });
+  },
+  async getNotes(_userId, notebookId) {
+    const q = notebookId ? `?notebookId=${encodeURIComponent(notebookId)}` : "";
+    const data = await api<{ notes: NoteSummary[] }>(`/api/notes${q}`);
+    return data.notes;
+  },
+  async getNote(_userId, id) {
+    const data = await api<{ note: Note }>(`/api/notes/${id}`);
+    return data.note;
+  },
+  async addNote(_userId, data) {
+    const res = await api<{ note: Note }>("/api/notes", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    return res.note;
+  },
+  async updateNote(_userId, id, patch) {
+    await api(`/api/notes/${id}`, { method: "PATCH", body: JSON.stringify(patch) });
+  },
+  async removeNote(_userId, id) {
+    await api(`/api/notes/${id}`, { method: "DELETE" });
+  },
+};
+
 // ---------- Notify ----------
 const notifyStore: NotifyStore = {
   async getSettings() {
@@ -324,5 +371,6 @@ export function createRemoteStore(): Store {
     todos: todosStore,
     health: healthStore,
     notify: notifyStore,
+    notes: notesStore,
   };
 }

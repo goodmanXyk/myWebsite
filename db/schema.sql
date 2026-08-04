@@ -124,3 +124,34 @@ CREATE TABLE IF NOT EXISTS notify_settings (
   dingtalk_webhook VARCHAR(500) NULL,
   CONSTRAINT fk_notify_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+-- ============================================================
+-- 个人知识库（Markdown 笔记）
+-- ============================================================
+
+-- 知识库（文件夹/目录）
+CREATE TABLE IF NOT EXISTS notebooks (
+  id         VARCHAR(36)  PRIMARY KEY,
+  user_id    VARCHAR(36)  NOT NULL,
+  name       VARCHAR(100) NOT NULL,
+  sort_order INT          NOT NULL DEFAULT 0,
+  created_at BIGINT       NOT NULL,
+  updated_at BIGINT       NOT NULL,
+  KEY idx_notebooks_user (user_id, sort_order),
+  CONSTRAINT fk_notebooks_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- 文档（Markdown 笔记）
+CREATE TABLE IF NOT EXISTS notes (
+  id          VARCHAR(36)  PRIMARY KEY,
+  user_id     VARCHAR(36)  NOT NULL,
+  notebook_id VARCHAR(36)  NULL,            -- NULL = 未分类
+  title       VARCHAR(255) NOT NULL,
+  content     MEDIUMTEXT   NULL,            -- Markdown 源码
+  sort_order  INT          NOT NULL DEFAULT 0,
+  created_at  BIGINT       NOT NULL,
+  updated_at  BIGINT       NOT NULL,
+  KEY idx_notes_user (user_id, notebook_id, updated_at),
+  CONSTRAINT fk_notes_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_notes_notebook FOREIGN KEY (notebook_id) REFERENCES notebooks(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
