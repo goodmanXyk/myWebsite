@@ -406,8 +406,8 @@ export default function NotesPage() {
           </Card>
         ) : editing ? (
           /* ---------- 编辑模式 ---------- */
-          <Card className="flex flex-col p-0">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-2.5">
+          <Card className="flex h-[calc(100dvh-8rem)] min-h-[420px] flex-col p-0">
+            <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-2.5">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-ink">编辑文档</span>
                 {dirty && <span className="text-xs text-amber-500">未保存</span>}
@@ -433,7 +433,7 @@ export default function NotesPage() {
                 </Button>
               </div>
             </div>
-            <div className="px-4 pt-3">
+            <div className="shrink-0 px-4 pt-3">
               <input
                 value={title}
                 onChange={(e) => {
@@ -446,6 +446,7 @@ export default function NotesPage() {
             </div>
             <RichTextEditor
               key={note.id}
+              fillHeight
               value={content}
               onChange={(md) => {
                 setContent(md);

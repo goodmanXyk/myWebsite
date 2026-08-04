@@ -18,6 +18,8 @@ interface Props {
   value: string;
   onChange: (md: string) => void;
   placeholder?: string;
+  /** 固定高度模式下：内容区占满剩余空间并内部滚动（工具栏始终可见） */
+  fillHeight?: boolean;
 }
 
 // ---------- 图标（内联 SVG） ----------
@@ -97,7 +99,7 @@ function FontSizeSelect({ editor }: { editor: Editor }) {
   );
 }
 
-export function RichTextEditor({ value, onChange, placeholder }: Props) {
+export function RichTextEditor({ value, onChange, placeholder, fillHeight = false }: Props) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [1, 2, 3, 4] } }),
@@ -189,7 +191,7 @@ export function RichTextEditor({ value, onChange, placeholder }: Props) {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className={fillHeight ? "flex min-h-0 flex-1 flex-col" : "flex flex-col"}>
       {/* 隐藏的文件选择框（本地图片） */}
       <input
         ref={fileInputRef}
@@ -263,7 +265,7 @@ export function RichTextEditor({ value, onChange, placeholder }: Props) {
       </div>
 
       {/* 编辑器 */}
-      <div className="min-h-[420px] px-4 py-2">
+      <div className={fillHeight ? "min-h-0 flex-1 overflow-y-auto px-4 py-2" : "min-h-[420px] px-4 py-2"}>
         <EditorContent editor={editor} className="outline-none" />
       </div>
     </div>
