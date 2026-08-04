@@ -18,7 +18,8 @@ import type {
 import { todayKey } from "@/lib/storage";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
+import { Dropdown } from "@/components/ui/Dropdown";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { Card } from "@/components/ui/Card";
 import { ProgressCircle } from "@/components/ui/charts/ProgressCircle";
 import { LineTrend } from "@/components/ui/charts/LineTrend";
@@ -460,12 +461,7 @@ export default function HealthPage() {
 
       {/* 共享日期选择器 */}
       <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3">
-        <Input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          className="w-44"
-        />
+        <DatePicker value={selectedDate} onChange={setSelectedDate} className="w-44" />
         <Button variant="ghost" onClick={() => setSelectedDate(todayKey())}>
           今天
         </Button>
@@ -643,10 +639,10 @@ export default function HealthPage() {
                   <p className="text-sm font-medium text-ink">
                     {isToday ? "添加今日饮食" : `添加 ${shortDateLabel(selectedDate)} 饮食`}
                   </p>
-                  <Select
+                  <Dropdown
                     label="餐次 / Meal"
                     value={dietMeal}
-                    onChange={(e) => setDietMeal(e.target.value as MealType)}
+                    onChange={(v) => setDietMeal(v as MealType)}
                     options={mealOptions}
                   />
                   <Input
@@ -857,10 +853,10 @@ export default function HealthPage() {
                       label="起床时间"
                     />
                   </div>
-                  <Select
+                  <Dropdown
                     label="睡眠质量 / Quality"
                     value={sleepQuality}
-                    onChange={(e) => setSleepQuality(e.target.value as SleepQuality)}
+                    onChange={(v) => setSleepQuality(v as SleepQuality)}
                     options={[
                       { value: "good", label: "好 / Good" },
                       { value: "fair", label: "中 / Fair" },

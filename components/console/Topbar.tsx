@@ -47,10 +47,24 @@ export function Topbar({
         <h2 className="text-sm font-medium text-ink">{title}</h2>
       </div>
       <div className="relative flex items-center gap-3">
-        <input
-          className="hidden w-64 rounded-lg border border-line bg-canvas px-3 py-1.5 text-sm outline-none transition-colors placeholder:text-muted focus:border-ink md:block"
-          placeholder="搜索工作流…"
-        />
+        <div className="relative hidden md:block">
+          <svg
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="9" cy="9" r="6" />
+            <path d="m16 16-3.5-3.5" />
+          </svg>
+          <input
+            className="w-64 rounded-full border border-white/10 bg-white/[0.03] py-1.5 pl-9 pr-3 text-sm text-ink outline-none transition-all placeholder:text-muted/60 hover:border-white/20 focus:border-white/30 focus:ring-2 focus:ring-white/10"
+            placeholder="搜索工作流…"
+          />
+        </div>
         <NotificationBell />
         <button
           onClick={() => setOpen((v) => !v)}

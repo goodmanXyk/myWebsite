@@ -7,6 +7,7 @@ import { getStore } from "@/lib/store";
 import type { Notebook, Note, NoteSummary } from "@/lib/store";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Dropdown } from "@/components/ui/Dropdown";
 import { Card } from "@/components/ui/Card";
 import { MarkdownView } from "@/components/ui/MarkdownView";
 import { RichTextEditor } from "@/components/console/RichTextEditor";
@@ -413,18 +414,15 @@ export default function NotesPage() {
                 {dirty && <span className="text-xs text-amber-500">未保存</span>}
               </div>
               <div className="flex items-center gap-2">
-                <select
+                <Dropdown
                   value={note.notebookId ?? ""}
-                  onChange={(e) => moveNote(e.target.value)}
-                  className="rounded-lg border border-line bg-surface px-2 py-1 text-xs text-muted outline-none focus:border-ink"
-                >
-                  <option value="">未分类</option>
-                  {notebooks.map((nb) => (
-                    <option key={nb.id} value={nb.id}>
-                      {nb.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={moveNote}
+                  options={[
+                    { value: "", label: "未分类" },
+                    ...notebooks.map((nb) => ({ value: nb.id, label: nb.name })),
+                  ]}
+                  className="w-36"
+                />
                 <Button variant="secondary" onClick={() => setEditing(false)} className="px-3 py-1 text-xs">
                   返回预览
                 </Button>
@@ -464,18 +462,15 @@ export default function NotesPage() {
                 {dirty && <span className="text-xs text-amber-500">有未保存的修改</span>}
               </div>
               <div className="flex items-center gap-2">
-                <select
+                <Dropdown
                   value={note.notebookId ?? ""}
-                  onChange={(e) => moveNote(e.target.value)}
-                  className="rounded-lg border border-line bg-surface px-2 py-1 text-xs text-muted outline-none focus:border-ink"
-                >
-                  <option value="">未分类</option>
-                  {notebooks.map((nb) => (
-                    <option key={nb.id} value={nb.id}>
-                      {nb.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={moveNote}
+                  options={[
+                    { value: "", label: "未分类" },
+                    ...notebooks.map((nb) => ({ value: nb.id, label: nb.name })),
+                  ]}
+                  className="w-36"
+                />
                 <Button onClick={() => setEditing(true)} className="px-3 py-1 text-xs">
                   编辑
                 </Button>

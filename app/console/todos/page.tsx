@@ -9,7 +9,7 @@ import type { Todo, TodoPriority, TodoStatus } from "@/lib/store";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
-import { Select } from "@/components/ui/Select";
+import { Dropdown } from "@/components/ui/Dropdown";
 import { Modal } from "@/components/ui/Modal";
 import { Card } from "@/components/ui/Card";
 
@@ -263,9 +263,9 @@ export default function TodosPage() {
             </button>
           ))}
         </div>
-        <Select
+        <Dropdown
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+          onChange={(v) => setStatusFilter(v as StatusFilter)}
           options={[
             { value: "all", label: "全部状态" },
             { value: "pending", label: "待完成" },
@@ -273,9 +273,9 @@ export default function TodosPage() {
           ]}
           className="w-36"
         />
-        <Select
+        <Dropdown
           value={priorityFilter}
-          onChange={(e) => setPriorityFilter(e.target.value as PriorityFilter)}
+          onChange={(v) => setPriorityFilter(v as PriorityFilter)}
           options={[
             { value: "all", label: "全部优先级" },
             ...priorityOptions.map((o) => ({ value: o.value, label: o.label })),
@@ -372,18 +372,18 @@ export default function TodosPage() {
               value={form.due}
               onChange={(e) => setForm({ ...form, due: e.target.value })}
             />
-            <Select
+            <Dropdown
               label="优先级 / Priority"
               value={form.priority}
-              onChange={(e) => setForm({ ...form, priority: e.target.value as TodoPriority })}
+              onChange={(v) => setForm({ ...form, priority: v as TodoPriority })}
               options={priorityOptions}
             />
           </div>
           {editing && (
-            <Select
+            <Dropdown
               label="状态 / Status"
               value={form.status}
-              onChange={(e) => setForm({ ...form, status: e.target.value as TodoStatus })}
+              onChange={(v) => setForm({ ...form, status: v as TodoStatus })}
               options={[
                 { value: "pending", label: "待完成" },
                 { value: "completed", label: "已完成" },

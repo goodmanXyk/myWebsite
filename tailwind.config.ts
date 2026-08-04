@@ -11,8 +11,8 @@ const config: Config = {
         ink: "#ffffff",
         muted: "#8f8f8f",
         line: "rgba(255, 255, 255, 0.06)",
-        brand: "#0285ff",
-        "brand-dark": "#003f7a",
+        brand: "#f5f5f5",
+        "brand-dark": "#d4d4d4",
         canvas: "#131313",
         surface: "#161616",
         "surface-2": "#1c1c1c",
@@ -48,7 +48,7 @@ const config: Config = {
       boxShadow: {
         soft: "0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.4)",
         glow: "0 0 0 1px rgba(255,255,255,.06), 0 8px 30px rgba(0,0,0,.5)",
-        "brand-glow": "0 8px 30px rgba(2,133,255,.20)",
+        "brand-glow": "0 8px 30px rgba(255,255,255,.06)",
       },
       fontFamily: {
         sans: [

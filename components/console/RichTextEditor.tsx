@@ -13,6 +13,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import { Markdown } from "tiptap-markdown";
+import { Dropdown } from "@/components/ui/Dropdown";
 
 interface Props {
   value: string;
@@ -79,23 +80,21 @@ function FontSizeSelect({ editor }: { editor: Editor }) {
     : "p";
   const label = level === "p" ? "正文" : `标题 ${level[1]}`;
   return (
-    <select
-      title="字号"
-      aria-label="字号"
+    <Dropdown
       value={level}
-      onChange={(e) => {
-        const v = e.target.value;
+      onChange={(v) => {
         if (v === "p") editor.chain().focus().setParagraph().run();
         else editor.chain().focus().toggleHeading({ level: Number(v[1]) as 1 | 2 | 3 | 4 }).run();
       }}
-      className="h-7 rounded-md border border-line bg-surface px-1.5 text-xs text-muted outline-none hover:text-ink focus:border-ink"
-    >
-      <option value="p">正文</option>
-      <option value="h1">标题 1</option>
-      <option value="h2">标题 2</option>
-      <option value="h3">标题 3</option>
-      <option value="h4">标题 4</option>
-    </select>
+      options={[
+        { value: "p", label: "正文" },
+        { value: "h1", label: "标题 1" },
+        { value: "h2", label: "标题 2" },
+        { value: "h3", label: "标题 3" },
+        { value: "h4", label: "标题 4" },
+      ]}
+      className="w-24"
+    />
   );
 }
 
