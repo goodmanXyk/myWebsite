@@ -86,8 +86,11 @@ export default function ConsoleHome() {
   return (
     <div className="mx-auto max-w-5xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-ink">欢迎回来，{user?.name}</h1>
-        <p className="mt-1 text-sm text-muted">
+        <p className="text-xs font-medium uppercase tracking-widest text-brand">Dashboard</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-gradient">
+          欢迎回来，{user?.name}
+        </h1>
+        <p className="mt-2 text-sm text-muted">
           这里是你的 AI 工作流控制台。今日概览与你的待办、健康数据已自动同步。
         </p>
       </div>
@@ -97,7 +100,7 @@ export default function ConsoleHome() {
       </h2>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         <Link href="/console/todos" className="col-span-1">
-          <Card className="h-full transition-colors hover:border-brand">
+          <Card className="h-full transition-all hover:border-brand hover:shadow-brand-glow">
             <p className="text-xs text-muted">待完成</p>
             <p className="mt-1 text-2xl font-semibold text-ink">
               {summary ? summary.todoPending : "—"}
@@ -105,7 +108,7 @@ export default function ConsoleHome() {
           </Card>
         </Link>
         <Link href="/console/todos" className="col-span-1">
-          <Card className="h-full transition-colors hover:border-brand">
+          <Card className="h-full transition-all hover:border-brand hover:shadow-brand-glow">
             <p className="text-xs text-muted">已逾期</p>
             <p className="mt-1 text-2xl font-semibold text-red-500">
               {summary ? summary.todoOverdue : "—"}
@@ -113,7 +116,7 @@ export default function ConsoleHome() {
           </Card>
         </Link>
         <Link href="/console/todos" className="col-span-1">
-          <Card className="h-full transition-colors hover:border-brand">
+          <Card className="h-full transition-all hover:border-brand hover:shadow-brand-glow">
             <p className="text-xs text-muted">今日完成</p>
             <p className="mt-1 text-2xl font-semibold text-ink">
               {summary ? summary.todoDoneToday : "—"}
@@ -121,7 +124,7 @@ export default function ConsoleHome() {
           </Card>
         </Link>
         <Link href="/console/health" className="col-span-1">
-          <Card className="h-full transition-colors hover:border-brand">
+          <Card className="h-full transition-all hover:border-brand hover:shadow-brand-glow">
             <p className="text-xs text-muted">饮水进度</p>
             <p className="mt-1 text-2xl font-semibold text-ink">
               {summary ? `${summary.waterPercent}%` : "—"}
@@ -129,7 +132,7 @@ export default function ConsoleHome() {
           </Card>
         </Link>
         <Link href="/console/health" className="col-span-1">
-          <Card className="h-full transition-colors hover:border-brand">
+          <Card className="h-full transition-all hover:border-brand hover:shadow-brand-glow">
             <p className="text-xs text-muted">今日健身</p>
             <p className="mt-1 text-2xl font-semibold text-ink">
               {summary ? summary.workoutDone : "—"}
@@ -137,7 +140,7 @@ export default function ConsoleHome() {
           </Card>
         </Link>
         <Link href="/console/health" className="col-span-1">
-          <Card className="h-full transition-colors hover:border-brand">
+          <Card className="h-full transition-all hover:border-brand hover:shadow-brand-glow">
             <p className="text-xs text-muted">最新体重</p>
             <p className="mt-1 text-2xl font-semibold text-ink">
               {summary ? summary.latestWeight : "—"}

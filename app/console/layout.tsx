@@ -54,7 +54,7 @@ export default function ConsoleLayout({
 
         <div className="flex flex-1 flex-col overflow-hidden">
           <Topbar user={user} onMenuClick={() => setNavOpen(true)} />
-          <main className="flex-1 overflow-y-auto bg-canvas p-4 md:p-8">
+          <main className="app-bg flex-1 overflow-y-auto p-4 md:p-8">
             {children}
           </main>
         </div>
