@@ -1,4 +1,4 @@
-﻿// RemoteStore：真实后端实现。所有数据通过 Next.js API Route 读写 MySQL。
+// RemoteStore：真实后端实现。所有数据通过 Next.js API Route 读写 MySQL。
 // 页面代码无需改动调用方式（与 LocalStore 同一套接口），只是所有方法变为异步。
 import type {
   AuthResult,
@@ -323,7 +323,12 @@ const notesStore: NotesStore = {
     await api(`/api/notebooks/${id}`, { method: "DELETE" });
   },
   async getNotes(_userId, notebookId) {
-    const q = notebookId ? `?notebookId=${encodeURIComponent(notebookId)}` : "";
+    const q =
+      notebookId === null
+        ? "?notebookId=null"
+        : notebookId
+          ? `?notebookId=${encodeURIComponent(notebookId)}`
+          : "";
     const data = await api<{ notes: NoteSummary[] }>(`/api/notes${q}`);
     return data.notes;
   },

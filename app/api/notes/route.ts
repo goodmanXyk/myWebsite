@@ -1,4 +1,4 @@
-﻿import crypto from "crypto";
+import crypto from "crypto";
 import type { RowDataPacket } from "mysql2";
 import { pool } from "@/lib/server/db";
 import { fail, json, readBody } from "@/lib/server/respond";
@@ -11,7 +11,15 @@ export async function GET(req: Request) {
 
   const notebookId = new URL(req.url).searchParams.get("notebookId");
   let rows: RowDataPacket[];
-  if (notebookId) {
+  if (notebookId === "null") {
+    // 未分类：notebook_id 为 NULL 的文档
+    [rows] = await pool.execute<RowDataPacket[]>(
+      `SELECT id, notebook_id, title, created_at, updated_at
+         FROM notes WHERE user_id = ? AND notebook_id IS NULL
+        ORDER BY updated_at DESC`,
+      [user.id]
+    );
+  } else if (notebookId) {
     [rows] = await pool.execute<RowDataPacket[]>(
       `SELECT id, notebook_id, title, created_at, updated_at
          FROM notes WHERE user_id = ? AND notebook_id = ?
