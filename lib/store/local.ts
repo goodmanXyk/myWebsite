@@ -199,8 +199,11 @@ const notifyStore: NotifyStore = {
   async saveSettings(userId, settings) {
     notify.saveNotificationSettings(userId, settings);
   },
-  simulatePush(kind, payload) {
-    notify.simulatePush(kind, payload);
+  async sendTest() {
+    return {
+      ok: true,
+      data: { email: "本地演示模式：模拟发送成功（未连接真实 SMTP）" },
+    };
   },
 };
 

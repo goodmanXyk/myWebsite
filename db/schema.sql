@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- FlowAI 后端数据库 Schema（MySQL）
 -- 数据库：flowai  |  字符集：utf8mb4
 -- 时间戳统一使用 BIGINT（毫秒），与前端 LocalStore 数据格式保持一致
@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS todos (
   status       ENUM('pending','completed') NOT NULL DEFAULT 'pending',
   created_at   BIGINT NOT NULL,
   completed_at BIGINT NULL,
+  reminder_sent_at BIGINT NULL,        -- 最近一次提醒发送时间（幂等标记，改期后重置）
   KEY idx_todos_user (user_id, created_at),
   CONSTRAINT fk_todos_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;

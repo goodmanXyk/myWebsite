@@ -1,6 +1,6 @@
 import { readJSON, writeJSON } from "./storage";
 
-export type WebhookKind = "wecom" | "dingtalk";
+export type WebhookKind = "wecom"; // 企业微信群机器人（钉钉已下线，列保留兼容）
 
 export interface NotificationSettings {
   enabled: boolean;

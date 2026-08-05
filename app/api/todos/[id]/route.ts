@@ -1,4 +1,4 @@
-﻿import type { ResultSetHeader } from "mysql2";
+import type { ResultSetHeader } from "mysql2";
 import { pool } from "@/lib/server/db";
 import { fail, json, readBody } from "@/lib/server/respond";
 import { requireUser } from "@/lib/server/auth";
@@ -31,6 +31,9 @@ export async function PATCH(req: Request, { params }: Params) {
       vals.push(v);
     }
   }
+
+  // 修改截止时间时重置提醒标记，允许改期后重新提醒
+  if ("due" in body) sets.push("reminder_sent_at = NULL");
 
   if (sets.length === 0) return fail("没有需要更新的字段");
 

@@ -111,10 +111,16 @@ export interface HealthStore {
   deleteSleepEntry(userId: string, id: string): Promise<void>;
 }
 
+export interface NotifyTestResult {
+  ok: boolean;
+  error?: string;
+  data?: { email: string; wecom?: string };
+}
+
 export interface NotifyStore {
   getSettings(userId: string): Promise<NotificationSettings>;
   saveSettings(userId: string, settings: NotificationSettings): Promise<void>;
-  simulatePush(kind: WebhookKind, payload: PushPayload): void;
+  sendTest(userId: string): Promise<NotifyTestResult>;
 }
 
 export interface NotesStore {

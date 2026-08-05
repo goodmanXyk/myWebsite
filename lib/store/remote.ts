@@ -20,8 +20,6 @@ import type {
   SleepEntry,
   HealthSettings,
   NotificationSettings,
-  WebhookKind,
-  PushPayload,
   Notebook,
   Note,
   NoteSummary,
@@ -373,10 +371,16 @@ const notifyStore: NotifyStore = {
       body: JSON.stringify(settings),
     });
   },
-  simulatePush(kind: WebhookKind, payload: PushPayload) {
-    // 模拟推送：打印到控制台（真实推送留待后续接入）
-    // eslint-disable-next-line no-console
-    console.log(`[simulatePush:${kind}]`, JSON.stringify(payload, null, 2));
+  async sendTest() {
+    try {
+      const data = await api<{ data: { email: string; wecom?: string } }>(
+        "/api/notify/test",
+        { method: "POST" }
+      );
+      return { ok: true, data: data.data };
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : "发送失败" };
+    }
   },
 };
 
