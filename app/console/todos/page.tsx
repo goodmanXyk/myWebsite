@@ -12,7 +12,8 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Modal } from "@/components/ui/Modal";
-import { DateTimePicker } from "@/components/ui/DateTimePicker";
+import { DatePicker } from "@/components/ui/DatePicker";
+import { TimePicker } from "@/components/ui/TimePicker";
 import { Card } from "@/components/ui/Card";
 
 const store = getStore();
@@ -394,10 +395,23 @@ export default function TodosPage() {
             rows={3}
           />
           <div className="grid grid-cols-2 gap-4">
-            <DateTimePicker
-              label="截止时间 / Due（可选）"
-              value={form.due}
-              onChange={(v) => setForm({ ...form, due: v })}
+            <DatePicker
+              label="截止日期 / Due date（可选）"
+              value={form.due.slice(0, 10)}
+              onChange={(d) =>
+                setForm({ ...form, due: d + (form.due.slice(11, 16) || "T" + new Date().toTimeString().slice(0, 5)) })
+              }
+            />
+            <TimePicker
+              label="截止时间 / Due time（可选）"
+              value={form.due.slice(11, 16)}
+              onChange={(t) => {
+                const d = new Date();
+                const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+                  d.getDate()
+                ).padStart(2, "0")}`;
+                setForm({ ...form, due: (form.due.slice(0, 10) || today) + "T" + t });
+              }}
             />
             <Dropdown
               label="优先级 / Priority"

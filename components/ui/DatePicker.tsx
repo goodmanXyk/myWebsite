@@ -1,11 +1,11 @@
-﻿"use client";
+"use client";
 
-import { useEffect, useRef, useState } from "react";
-import { addMonths, format, isSameDay, isSameMonth, startOfMonth, startOfWeek, addDays, isToday } from "date-fns";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { addMonths, format, isSameDay, isSameMonth, startOfMonth, startOfWeek, addDays, isToday, parse } from "date-fns";
 import { zhCN } from "date-fns/locale";
 
 interface DatePickerProps {
-  value: string; // YYYY-MM-DD
+  value: string; // "YYYY-MM-DD" 或空
   onChange: (date: string) => void;
   label?: string;
   className?: string;
@@ -13,16 +13,17 @@ interface DatePickerProps {
 
 const WEEKDAYS = ["日", "一", "二", "三", "四", "五", "六"];
 
-/**
- * 自定义日历日期选择（OpenAI 风格柔和弹出层）。
- */
+/** 自定义日历选择器（OpenAI 风格柔和弹出层），空间不足时自动向上弹出 */
 export function DatePicker({ value, onChange, label, className = "" }: DatePickerProps) {
   const [open, setOpen] = useState(false);
+  const [position, setPosition] = useState<"down" | "up">("down");
   const [viewMonth, setViewMonth] = useState<Date>(() => {
-    const d = new Date(value + "T00:00:00");
+    const d = parse(value || "", "yyyy-MM-dd", new Date());
     return isNaN(d.getTime()) ? new Date() : d;
   });
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -39,14 +40,26 @@ export function DatePicker({ value, onChange, label, className = "" }: DatePicke
     };
   }, []);
 
-  const selected = (() => {
-    const d = new Date(value + "T00:00:00");
-    return isNaN(d.getTime()) ? null : d;
-  })();
+  useLayoutEffect(() => {
+    if (!open) return;
+    const t = requestAnimationFrame(() => {
+      const btn = triggerRef.current;
+      const pop = popRef.current;
+      if (!btn || !pop) return;
+      const btnRect = btn.getBoundingClientRect();
+      const popHeight = pop.offsetHeight || 320;
+      const spaceBelow = window.innerHeight - btnRect.bottom - 8;
+      const spaceAbove = btnRect.top - 8;
+      setPosition(spaceBelow >= popHeight || spaceBelow >= spaceAbove ? "down" : "up");
+    });
+    return () => cancelAnimationFrame(t);
+  }, [open]);
+
+  const selected = parse(value || "2000-01-01", "yyyy-MM-dd", new Date());
+  const hasDate = value !== "" && !isNaN(selected.getTime());
 
   const days: Date[] = [];
-  const monthStart = startOfMonth(viewMonth);
-  const gridStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+  const gridStart = startOfWeek(startOfMonth(viewMonth), { weekStartsOn: 0 });
   for (let i = 0; i < 42; i++) days.push(addDays(gridStart, i));
 
   return (
@@ -54,14 +67,15 @@ export function DatePicker({ value, onChange, label, className = "" }: DatePicke
       {label && <span className="text-sm font-medium text-ink">{label}</span>}
       <div className="relative">
         <button
+          ref={triggerRef}
           type="button"
           onClick={() => setOpen((v) => !v)}
           className={`flex w-full items-center justify-between gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-ink transition-colors hover:border-white/20 ${
             open ? "border-white/25" : ""
           }`}
         >
-          <span className="truncate">
-            {selected ? format(selected, "yyyy年M月d日 EEEE", { locale: zhCN }) : "请选择日期"}
+          <span className={`truncate ${hasDate ? "text-ink" : "text-muted"}`}>
+            {hasDate ? format(selected, "yyyy年M月d日 EEEE", { locale: zhCN }) : "请选择日期"}
           </span>
           <svg
             className="h-4 w-4 shrink-0 text-muted"
@@ -79,8 +93,12 @@ export function DatePicker({ value, onChange, label, className = "" }: DatePicke
           </svg>
         </button>
         {open && (
-          <div className="absolute left-0 z-30 mt-1.5 w-64 rounded-xl border border-white/10 bg-[#1c1c1c] p-2.5 shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
-            {/* 月份导航 */}
+          <div
+            ref={popRef}
+            className={`absolute left-0 z-30 w-64 rounded-xl border border-white/10 bg-[#1c1c1c] p-2.5 shadow-[0_12px_32px_rgba(0,0,0,0.5)] ${
+              position === "down" ? "top-full mt-1.5" : "bottom-full mb-1.5"
+            }`}
+          >
             <div className="mb-2 flex items-center justify-between">
               <button
                 type="button"
@@ -102,7 +120,6 @@ export function DatePicker({ value, onChange, label, className = "" }: DatePicke
                 ›
               </button>
             </div>
-            {/* 星期 */}
             <div className="mb-1 grid grid-cols-7 text-center">
               {WEEKDAYS.map((w) => (
                 <span key={w} className="py-1 text-xs text-muted">
@@ -110,11 +127,10 @@ export function DatePicker({ value, onChange, label, className = "" }: DatePicke
                 </span>
               ))}
             </div>
-            {/* 日期 */}
             <div className="grid grid-cols-7 gap-0.5">
               {days.map((d) => {
                 const inMonth = isSameMonth(d, viewMonth);
-                const isSel = selected ? isSameDay(d, selected) : false;
+                const isSel = hasDate ? isSameDay(d, selected) : false;
                 const isTod = isToday(d);
                 return (
                   <button
