@@ -30,15 +30,16 @@ export async function runTodoReminders(
   const [rows] = await pool.execute<RowDataPacket[]>(
     `SELECT u.id AS user_id, u.email,
             t.id AS todo_id, t.title, t.due,
-            ns.lead_minutes, ns.wecom_webhook
+            COALESCE(ns.lead_minutes, 0) AS lead_minutes,
+            ns.wecom_webhook
        FROM todos t
        JOIN users u ON u.id = t.user_id
-       JOIN notify_settings ns ON ns.user_id = u.id
+       LEFT JOIN notify_settings ns ON ns.user_id = u.id
       WHERE t.status = 'pending'
         AND t.due IS NOT NULL
         AND t.reminder_sent_at IS NULL
-        AND ns.enabled = 1
-        AND t.due <= ? + ns.lead_minutes * 60000
+        AND (ns.enabled IS NULL OR ns.enabled = 1)
+        AND t.due <= ? + COALESCE(ns.lead_minutes, 0) * 60000
         AND t.due >= ? - ?
         ${userId ? "AND u.id = ?" : ""}`,
     userId ? [now, now, BACKFILL_WINDOW_MS, userId] : [now, now, BACKFILL_WINDOW_MS]
