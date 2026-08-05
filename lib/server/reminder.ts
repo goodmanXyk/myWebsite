@@ -23,7 +23,10 @@ function formatDueCn(ts: number): string {
   )}:${pad(d.getUTCMinutes())}`;
 }
 
-export async function runTodoReminders(now: number = Date.now()): Promise<ReminderRunResult> {
+export async function runTodoReminders(
+  now: number = Date.now(),
+  userId?: string
+): Promise<ReminderRunResult> {
   const [rows] = await pool.execute<RowDataPacket[]>(
     `SELECT u.id AS user_id, u.email,
             t.id AS todo_id, t.title, t.due,
@@ -36,8 +39,9 @@ export async function runTodoReminders(now: number = Date.now()): Promise<Remind
         AND t.reminder_sent_at IS NULL
         AND ns.enabled = 1
         AND t.due <= ? + ns.lead_minutes * 60000
-        AND t.due >= ? - ?`,
-    [now, now, BACKFILL_WINDOW_MS]
+        AND t.due >= ? - ?
+        ${userId ? "AND u.id = ?" : ""}`,
+    userId ? [now, now, BACKFILL_WINDOW_MS, userId] : [now, now, BACKFILL_WINDOW_MS]
   );
 
   const result: ReminderRunResult = {

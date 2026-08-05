@@ -8,8 +8,9 @@ const store = getStore();
 
 /**
  * 挂载于 console layout 的无 UI 组件。
- * 应用打开期间每 30 秒轮询一次，对待办「已到期且未完成、且本会话未提醒过」的触发 toast 提醒。
- * 纯前端无后台，关闭页面不会提醒（符合本阶段预期）。
+ * 每 30 秒轮询：
+ * 1) 调用后端 /api/reminders/trigger 真实发送到期待办提醒（邮件/企微群，幂等，只发一次）
+ * 2) 前端站内 toast（非企微邮箱用户也适用）
  */
 export function ReminderWatcher() {
   const { user } = useAuth();
@@ -19,7 +20,29 @@ export function ReminderWatcher() {
   useEffect(() => {
     if (!user) return;
 
+    const triggerRemote = async (): Promise<boolean> => {
+      try {
+        const token = window.localStorage.getItem("aiwf_token");
+        if (!token) return false;
+        const res = await fetch("/api/reminders/trigger", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json().catch(() => ({}));
+        const sent = Number(data.emailed || 0) + Number(data.wecomPushed || 0);
+        if (sent > 0) {
+          show("已发送待办提醒至你的邮箱 📧", "success");
+          return true;
+        }
+        return false;
+      } catch {
+        return false;
+      }
+    };
+
     const check = async () => {
+      await triggerRemote();
+
       const now = Date.now();
       let todos;
       try {
