@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { addMonths, format, isSameDay, isSameMonth, startOfMonth, startOfWeek, addDays, isToday, parse } from "date-fns";
@@ -49,7 +49,9 @@ export function DateTimePicker({ value, onChange, label, className = "" }: DateT
   for (let i = 0; i < 42; i++) days.push(addDays(gridStart, i));
 
   const setDate = (d: Date) => {
-    const next = format(d, "yyyy-MM-dd") + (timePart ? `T${timePart}` : "");
+    // 未选择时间时默认带当前时间，保证截止时间始终包含日期 + 时间
+    const t = timePart || format(new Date(), "HH:mm");
+    const next = format(d, "yyyy-MM-dd") + `T${t}`;
     onChange(next);
   };
   const setTime = (t: string) => {
