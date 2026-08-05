@@ -363,35 +363,40 @@ export default function NotesPage() {
 
       {/* 中栏：文档列表（可折叠） */}
       {!collapse.middle && (
-      <div className="flex w-full flex-col gap-2 lg:w-60 lg:shrink-0">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-ink">{filterLabel}</p>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="secondary"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={importing}
-            >
-              {importing ? "导入中…" : "导入"}
-            </Button>
-            <Button variant="secondary" onClick={createNote}>
-              + 新建文档
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".md,.markdown,.txt,.doc,.docx,.xls,.xlsx,.csv,.pdf"
-              className="hidden"
-              onChange={handleImport}
-            />
-            <button
-              onClick={() => toggleCollapse("middle")}
-              title="收起文档列表"
-              className="hidden h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-white/10 hover:text-ink lg:flex"
-            >
-              ‹
-            </button>
-          </div>
+      <div className="flex w-full flex-col gap-2 lg:w-64 lg:shrink-0">
+        <div className="flex items-center justify-between gap-2">
+          <p className="min-w-0 truncate text-sm font-medium text-ink">{filterLabel}</p>
+          <button
+            onClick={() => toggleCollapse("middle")}
+            title="收起文档列表"
+            className="hidden h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted transition-colors hover:bg-white/10 hover:text-ink lg:flex"
+          >
+            ‹
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importing}
+            className="flex-1 px-3 py-1.5 text-xs"
+          >
+            {importing ? "导入中…" : "导入"}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={createNote}
+            className="flex-1 px-3 py-1.5 text-xs"
+          >
+            + 新建文档
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".md,.markdown,.txt,.doc,.docx,.xls,.xlsx,.csv,.pdf"
+            className="hidden"
+            onChange={handleImport}
+          />
         </div>
         {!loaded ? (
           <p className="py-8 text-center text-xs text-muted">加载中…</p>
