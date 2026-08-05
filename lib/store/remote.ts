@@ -101,10 +101,10 @@ const authStore: AuthStore = {
     return { ok: false, error: data.error || "登录失败" };
   },
 
-  async register(email, password, name) {
+  async register(email, password, name, code) {
     const data = await apiSoft("/api/auth/register", {
       method: "POST",
-      body: JSON.stringify({ email, password, name }),
+      body: JSON.stringify({ email, password, name, code }),
     });
     if (data.ok && data.user && data.token) {
       setToken(data.token);
@@ -112,6 +112,42 @@ const authStore: AuthStore = {
       return { ok: true, user: data.user };
     }
     return { ok: false, error: data.error || "注册失败" };
+  },
+
+  async sendCode(email, purpose) {
+    try {
+      const data = await api<{ message?: string }>("/api/auth/send-code", {
+        method: "POST",
+        body: JSON.stringify({ email, purpose }),
+      });
+      return { ok: true, message: data.message };
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : "发送失败" };
+    }
+  },
+
+  async resetPassword(email, code, password) {
+    try {
+      const data = await api<{ message?: string }>("/api/auth/reset-password", {
+        method: "POST",
+        body: JSON.stringify({ email, code, password }),
+      });
+      return { ok: true, message: data.message };
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : "重置失败" };
+    }
+  },
+
+  async changePassword(oldPassword, newPassword) {
+    try {
+      const data = await api<{ message?: string }>("/api/auth/change-password", {
+        method: "POST",
+        body: JSON.stringify({ oldPassword, newPassword }),
+      });
+      return { ok: true, message: data.message };
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : "修改失败" };
+    }
   },
 
   logout() {

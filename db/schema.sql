@@ -20,6 +20,18 @@ CREATE TABLE IF NOT EXISTS users (
 ) ENGINE=InnoDB;
 
 -- 登录会话表（随机 token，30 天有效期）
+-- 邮箱验证码（注册 / 重置密码）
+CREATE TABLE IF NOT EXISTS email_verifications (
+  id         VARCHAR(36) PRIMARY KEY,
+  email      VARCHAR(255) NOT NULL,
+  code       VARCHAR(6)  NOT NULL,
+  purpose    ENUM('register','reset') NOT NULL,
+  expires_at BIGINT NOT NULL,
+  used       TINYINT(1) NOT NULL DEFAULT 0,
+  created_at BIGINT NOT NULL,
+  KEY idx_ev_email_purpose (email, purpose)
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS sessions (
   token      VARCHAR(64) PRIMARY KEY,
   user_id    VARCHAR(36) NOT NULL,

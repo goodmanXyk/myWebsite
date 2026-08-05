@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/Card";
 const store = getStore();
 
 export default function SettingsPage() {
-  const { user } = useAuth();
+  const { user, changePassword } = useAuth();
   const { show } = useToast();
   const [enabled, setEnabled] = useState(true);
   const [leadMinutes, setLeadMinutes] = useState(0);
@@ -68,6 +68,32 @@ export default function SettingsPage() {
     } finally {
       setTesting(false);
     }
+  };
+
+  // 修改密码
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [pwError, setPwError] = useState("");
+  const [changingPw, setChangingPw] = useState(false);
+
+  const handleChangePassword = async () => {
+    setPwError("");
+    if (newPassword.length < 6) {
+      setPwError("新密码至少需要 6 位");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPwError("两次输入的新密码不一致");
+      return;
+    }
+    setChangingPw(true);
+    const res = await changePassword(oldPassword, newPassword);
+    setChangingPw(false);
+    if (!res.ok) {
+      setPwError(res.error || "修改失败");
+    }
+    // 成功时 useAuth 内部会清会话并跳转登录页
   };
 
   if (!user) return null;
@@ -137,6 +163,41 @@ export default function SettingsPage() {
         <div className="flex justify-end border-t border-line pt-4">
           <Button onClick={handleSave} disabled={!loaded}>
             保存设置
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="mt-4 flex flex-col gap-4">
+        <div>
+          <p className="text-sm font-medium text-ink">修改密码</p>
+          <p className="text-xs text-muted">修改后需要重新登录</p>
+        </div>
+        <Input
+          type="password"
+          value={oldPassword}
+          onChange={(e) => setOldPassword(e.target.value)}
+          label="当前密码 / Current password"
+          autoComplete="current-password"
+        />
+        <Input
+          type="password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          label="新密码 / New password"
+          autoComplete="new-password"
+          placeholder="至少 6 位"
+        />
+        <Input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          label="确认新密码 / Confirm new password"
+          autoComplete="new-password"
+          error={pwError || undefined}
+        />
+        <div className="flex justify-end">
+          <Button onClick={handleChangePassword} disabled={changingPw}>
+            {changingPw ? "修改中…" : "修改密码"}
           </Button>
         </div>
       </Card>

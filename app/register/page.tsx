@@ -11,19 +11,47 @@ import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 
 export default function RegisterPage() {
-  const { register } = useAuth();
+  const { register, sendCode } = useAuth();
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+
+  const handleSendCode = async () => {
+    setError("");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError("请先填写有效的邮箱地址");
+      return;
+    }
+    setSending(true);
+    const res = await sendCode(email.trim(), "register");
+    setSending(false);
+    if (!res.ok) {
+      setError(res.error || "验证码发送失败");
+      return;
+    }
+    setCountdown(60);
+    const timer = setInterval(() => {
+      setCountdown((c) => {
+        if (c <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return c - 1;
+      });
+    }, 1000);
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSubmitting(true);
-    const res = await register(email, password, name);
+    const res = await register(email, password, name, code);
     setSubmitting(false);
     if (res.ok) router.push("/console");
     else setError(res.error || "注册失败");
@@ -36,7 +64,7 @@ export default function RegisterPage() {
         <div className="mb-6 flex flex-col items-center text-center">
           <Logo showText={false} />
           <h1 className="mt-4 text-2xl font-semibold text-ink">创建账户</h1>
-          <p className="mt-1 text-sm text-muted">Create your account to get started</p>
+          <p className="mt-1 text-sm text-muted">通过邮箱验证码完成注册</p>
         </div>
         <Card>
           <form onSubmit={onSubmit} className="flex flex-col gap-4">
@@ -57,6 +85,30 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+            <div>
+              <div className="mb-1 text-xs font-medium text-muted">邮箱验证码 / Code</div>
+              <div className="flex items-end gap-2">
+                <Input
+                  name="code"
+                  inputMode="numeric"
+                  maxLength={6}
+                  placeholder="6 位验证码"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+                  className="flex-1"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleSendCode}
+                  disabled={sending || countdown > 0}
+                  className="shrink-0 px-3 py-2 text-xs"
+                >
+                  {countdown > 0 ? `${countdown}s` : sending ? "发送中…" : "发送验证码"}
+                </Button>
+              </div>
+            </div>
             <Input
               label="Password"
               name="password"

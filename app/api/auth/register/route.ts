@@ -1,21 +1,30 @@
-﻿import crypto from "crypto";
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import type { RowDataPacket } from "mysql2";
 import { pool } from "@/lib/server/db";
 import { fail, json, readBody } from "@/lib/server/respond";
 import { createSession } from "@/lib/server/auth";
+import { isValidEmail, verifyCode } from "@/lib/server/verify";
 
 export async function POST(req: Request) {
   const body = await readBody(req);
   const email = String(body.email ?? "").trim().toLowerCase();
   const password = String(body.password ?? "");
+  const code = String(body.code ?? "").trim();
   const name = body.name ? String(body.name).trim() : undefined;
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!isValidEmail(email)) {
     return fail("请输入有效的邮箱地址");
   }
   if (password.length < 6) {
     return fail("密码至少需要 6 位");
+  }
+  if (!code) {
+    return fail("请先获取邮箱验证码");
+  }
+  const okCode = await verifyCode(email, "register", code);
+  if (!okCode) {
+    return fail("验证码错误或已过期，请重新获取");
   }
 
   const [exists] = await pool.execute<RowDataPacket[]>(

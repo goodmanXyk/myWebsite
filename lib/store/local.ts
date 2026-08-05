@@ -67,7 +67,7 @@ const authStore: AuthStore = {
     return { ok: true, user: safe };
   },
 
-  async register(email, password, name) {
+  async register(email, password, name, _code) {
     const cleanEmail = email.trim().toLowerCase();
     if (!isValidEmail(cleanEmail)) {
       return { ok: false, error: "请输入有效的邮箱地址" };
@@ -91,6 +91,37 @@ const authStore: AuthStore = {
     const { password: _pw, ...safe } = newUser;
     window.localStorage.setItem(SESSION_KEY, JSON.stringify(safe));
     return { ok: true, user: safe };
+  },
+
+  async sendCode(_email, _purpose) {
+    return { ok: true, message: "本地演示模式：验证码已模拟发送" };
+  },
+
+  async resetPassword(email, code, password) {
+    const cleanEmail = email.trim().toLowerCase();
+    const users = readUsers();
+    const idx = users.findIndex((u) => u.email.toLowerCase() === cleanEmail);
+    if (idx === -1) return { ok: false, error: "该邮箱未注册" };
+    if (password.length < 6) return { ok: false, error: "新密码至少需要 6 位" };
+    if (!code) return { ok: false, error: "请输入验证码" };
+    users[idx].password = password;
+    writeUsers(users);
+    return { ok: true, message: "密码已重置，请使用新密码登录" };
+  },
+
+  async changePassword(oldPassword, newPassword) {
+    const session = window.localStorage.getItem(SESSION_KEY);
+    if (!session) return { ok: false, error: "未登录" };
+    const current = JSON.parse(session) as { id: string };
+    const users = readUsers();
+    const idx = users.findIndex((u) => u.id === current.id);
+    if (idx === -1) return { ok: false, error: "用户不存在" };
+    if (users[idx].password !== oldPassword) return { ok: false, error: "当前密码不正确" };
+    if (newPassword.length < 6) return { ok: false, error: "新密码至少需要 6 位" };
+    users[idx].password = newPassword;
+    writeUsers(users);
+    window.localStorage.removeItem(SESSION_KEY);
+    return { ok: true, message: "密码已修改，请重新登录" };
   },
 
   logout() {

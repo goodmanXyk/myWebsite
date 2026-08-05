@@ -27,7 +27,10 @@ export type AuthResult = { ok: boolean; error?: string; user?: User };
 
 export interface AuthStore {
   login(email: string, password: string): Promise<AuthResult>;
-  register(email: string, password: string, name?: string): Promise<AuthResult>;
+  register(email: string, password: string, name?: string, code?: string): Promise<AuthResult>;
+  sendCode(email: string, purpose: "register" | "reset"): Promise<{ ok: boolean; error?: string; message?: string }>;
+  resetPassword(email: string, code: string, password: string): Promise<{ ok: boolean; error?: string; message?: string }>;
+  changePassword(oldPassword: string, newPassword: string): Promise<{ ok: boolean; error?: string; message?: string }>;
   logout(): void;
   getSession(): User | null;
   // 预留：微信登录 / 绑定邮箱（本期未启用）
