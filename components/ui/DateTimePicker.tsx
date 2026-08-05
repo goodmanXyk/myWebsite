@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { addMonths, format, isSameDay, isSameMonth, startOfMonth, startOfWeek, addDays, isToday, parse } from "date-fns";
 import { zhCN } from "date-fns/locale";
 
@@ -12,17 +12,23 @@ interface DateTimePickerProps {
 }
 
 const WEEKDAYS = ["日", "一", "二", "三", "四", "五", "六"];
+const HOURS = Array.from({ length: 24 }, (_, i) => i);
+const MINUTES = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, "0"));
 
 /**
  * 自定义日期 + 时间选择（OpenAI 风格柔和弹出层，替代原生 datetime-local）。
+ * 时间部分为网格选择，与日历风格统一；弹层空间不足时自动向上弹出。
  */
 export function DateTimePicker({ value, onChange, label, className = "" }: DateTimePickerProps) {
   const [open, setOpen] = useState(false);
+  const [position, setPosition] = useState<"down" | "up">("down");
   const [viewMonth, setViewMonth] = useState<Date>(() => {
     const d = parse(value?.slice(0, 10) || "", "yyyy-MM-dd", new Date());
     return isNaN(d.getTime()) ? new Date() : d;
   });
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -39,10 +45,28 @@ export function DateTimePicker({ value, onChange, label, className = "" }: DateT
     };
   }, []);
 
+  // 打开时根据视口空间决定向上/向下展开
+  useLayoutEffect(() => {
+    if (!open) return;
+    const t = requestAnimationFrame(() => {
+      const btn = triggerRef.current;
+      const pop = popRef.current;
+      if (!btn || !pop) return;
+      const btnRect = btn.getBoundingClientRect();
+      const popHeight = pop.offsetHeight || 480;
+      const spaceBelow = window.innerHeight - btnRect.bottom - 8;
+      const spaceAbove = btnRect.top - 8;
+      setPosition(spaceBelow >= popHeight || spaceBelow >= spaceAbove ? "down" : "up");
+    });
+    return () => cancelAnimationFrame(t);
+  }, [open]);
+
   const datePart = value?.slice(0, 10) || "";
   const timePart = value?.slice(11, 16) || "";
   const selected = parse(datePart || "2000-01-01", "yyyy-MM-dd", new Date());
   const hasDate = datePart !== "" && !isNaN(selected.getTime());
+  const [selH, selM] = timePart ? timePart.split(":").map(Number) : [NaN, NaN];
+  const hasTime = timePart !== "" && !isNaN(selH) && !isNaN(selM);
 
   const days: Date[] = [];
   const gridStart = startOfWeek(startOfMonth(viewMonth), { weekStartsOn: 0 });
@@ -51,12 +75,15 @@ export function DateTimePicker({ value, onChange, label, className = "" }: DateT
   const setDate = (d: Date) => {
     // 未选择时间时默认带当前时间，保证截止时间始终包含日期 + 时间
     const t = timePart || format(new Date(), "HH:mm");
-    const next = format(d, "yyyy-MM-dd") + `T${t}`;
-    onChange(next);
+    onChange(format(d, "yyyy-MM-dd") + `T${t}`);
   };
-  const setTime = (t: string) => {
-    const next = (datePart || format(new Date(), "yyyy-MM-dd")) + `T${t}`;
-    onChange(next);
+  const setHour = (h: number) => {
+    const m = hasTime ? String(selM).padStart(2, "0") : "00";
+    onChange((datePart || format(new Date(), "yyyy-MM-dd")) + `T${String(h).padStart(2, "0")}:${m}`);
+  };
+  const setMinute = (m: string) => {
+    const h = hasTime ? String(selH).padStart(2, "0") : "00";
+    onChange((datePart || format(new Date(), "yyyy-MM-dd")) + `T${h}:${m}`);
   };
 
   return (
@@ -64,6 +91,7 @@ export function DateTimePicker({ value, onChange, label, className = "" }: DateT
       {label && <span className="text-sm font-medium text-ink">{label}</span>}
       <div className="relative">
         <button
+          ref={triggerRef}
           type="button"
           onClick={() => setOpen((v) => !v)}
           className={`flex w-full items-center justify-between gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-ink transition-colors hover:border-white/20 ${
@@ -72,7 +100,7 @@ export function DateTimePicker({ value, onChange, label, className = "" }: DateT
         >
           <span className={`truncate ${hasDate ? "text-ink" : "text-muted"}`}>
             {hasDate
-              ? format(selected, "yyyy年M月d日 EEEE", { locale: zhCN }) + (timePart ? ` ${timePart}` : "")
+              ? format(selected, "yyyy年M月d日 EEEE", { locale: zhCN }) + (hasTime ? ` ${timePart}` : "")
               : "请选择日期时间"}
           </span>
           <svg
@@ -91,7 +119,12 @@ export function DateTimePicker({ value, onChange, label, className = "" }: DateT
           </svg>
         </button>
         {open && (
-          <div className="absolute left-0 z-30 mt-1.5 w-64 rounded-xl border border-white/10 bg-[#1c1c1c] p-2.5 shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
+          <div
+            ref={popRef}
+            className={`absolute left-0 z-30 w-72 rounded-xl border border-white/10 bg-[#1c1c1c] p-2.5 shadow-[0_12px_32px_rgba(0,0,0,0.5)] ${
+              position === "down" ? "top-full mt-1.5" : "bottom-full mb-1.5"
+            }`}
+          >
             <div className="mb-2 flex items-center justify-between">
               <button
                 type="button"
@@ -145,14 +178,54 @@ export function DateTimePicker({ value, onChange, label, className = "" }: DateT
                 );
               })}
             </div>
-            <div className="mt-2 flex items-center justify-between border-t border-white/10 pt-2">
-              <span className="text-xs text-muted">时间</span>
-              <input
-                type="time"
-                value={timePart}
-                onChange={(e) => setTime(e.target.value)}
-                className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-1 text-sm text-ink outline-none transition-colors hover:border-white/20 focus:border-white/30 [color-scheme:dark]"
-              />
+            {/* 时间网格选择 */}
+            <div className="mt-2 border-t border-white/10 pt-2">
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="text-xs font-medium text-muted">时间</span>
+                <span className="text-xs tabular-nums text-ink">
+                  {hasTime ? `${timePart}` : "选择时分"}
+                </span>
+              </div>
+              <div className="flex flex-col gap-2">
+                <div>
+                  <div className="mb-1 text-[10px] uppercase tracking-wide text-muted/60">时</div>
+                  <div className="grid grid-cols-6 gap-0.5">
+                    {HOURS.map((h) => (
+                      <button
+                        key={h}
+                        type="button"
+                        onClick={() => setHour(h)}
+                        className={`flex h-7 items-center justify-center rounded-md text-xs tabular-nums transition-colors ${
+                          hasTime && selH === h
+                            ? "bg-white font-semibold text-black"
+                            : "text-ink hover:bg-white/10"
+                        }`}
+                      >
+                        {String(h).padStart(2, "0")}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div className="mb-1 text-[10px] uppercase tracking-wide text-muted/60">分</div>
+                  <div className="grid grid-cols-6 gap-0.5">
+                    {MINUTES.map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setMinute(m)}
+                        className={`flex h-7 items-center justify-center rounded-md text-xs tabular-nums transition-colors ${
+                          hasTime && selM === Number(m)
+                            ? "bg-white font-semibold text-black"
+                            : "text-ink hover:bg-white/10"
+                        }`}
+                      >
+                        {m}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
